@@ -17,7 +17,7 @@
             theme: {
                 extend: {
                     fontFamily: { 
-                        // 貨號與名稱優先使用 Inter
+                        // 貨號與名稱維持此順序
                         sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
                         // 價格優先使用 Decathlon VF
                         price: ['"Decathlon VF"', 'Inter', 'Noto Sans TC', 'sans-serif']
@@ -44,14 +44,14 @@
     <style>
         @font-face {
             font-family: "Decathlon VF";
-            /* 填入您的字體路徑 */
+            /* 請在此處 src 的 url("") 填入您的字體檔案路徑 */
             src: url("https://www.decathlon.tw/fonts/Decathlon-VF.woff2") format("woff2");
             font-weight: 100 900;
             font-style: normal;
             font-display: swap;
         }
 
-        /* 核心互動動畫 */
+        /* 已移除 fade-in 淡入動畫 */
         @keyframes verticalBlurSpin {
             0% { filter: blur(0px); transform: translateY(0); }
             25% { filter: blur(2px); transform: translateY(-10px); opacity: 0.8;}
@@ -107,11 +107,13 @@
         const ChevronRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>;
         const DicesIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><circle cx="15.5" cy="15.5" r="1.5"></circle><circle cx="15.5" cy="8.5" r="1.5"></circle><circle cx="8.5" cy="15.5" r="1.5"></circle></svg>;
         const XIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
-        const ArrowLeftIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>;
+        // 💡 調整 ArrowLeftIcon 大小為 18x18，與其他 Header Icon 一致
+        const ArrowLeftIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>;
         const ExternalLinkIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>;
         const FilterIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>;
         const BookOpenIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>;
         const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
+        const MessageIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>;
 
         const ToggleBtn = ({ active, onClick, className = "", children }) => (
             <button type="button" onClick={onClick} className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border-2 transition-all flex items-center justify-center space-x-1 focus:outline-none ${active ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'} ${className}`}>
@@ -153,7 +155,6 @@
             return (
                 <div className={`flex-1 min-h-0 max-h-[120px] flex bg-white rounded-xl shadow-sm border-2 transition-colors overflow-hidden ${isLocked ? (currentItem?.isOwned ? 'border-gray-300 bg-gray-50' : currentItem?.isCart ? 'border-amber-400 bg-amber-50' : 'border-orange-400 bg-orange-50') : 'border-transparent hover:border-blue-200'}`}>
                     
-                    {/* 左側：拉霸機圖片 */}
                     <div 
                         className="h-full aspect-square relative bg-gray-100 flex-shrink-0 flex items-center justify-center border-r border-gray-100 cursor-pointer overflow-hidden"
                         onClick={showNavTemporarily}
@@ -176,7 +177,7 @@
                                     <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">✅ 已擁有</div>
                                 )}
                                 {currentItem.isCart && (
-                                    <div className="absolute inset-0 bg-amber-900/30 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">🛒 購物車</div>
+                                    <div className="absolute inset-0 bg-amber-900/30 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">❤️ 待購清單</div>
                                 )}
                                 {!isPresetItem && <div className={`absolute bottom-0.5 right-0.5 bg-black/50 text-white text-[7px] px-1 py-0.5 rounded transition-opacity duration-500 ${navVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>{selectedIndex + 1}/{items.length}</div>}
                             </React.Fragment>
@@ -185,25 +186,27 @@
                         )}
                     </div>
 
-                    {/* 右側：商品資訊 (💡 調整 pt 與 pb 讓重心上移) */}
                     <div className="flex-1 pt-1.5 pb-2.5 px-2 flex flex-col min-w-0 bg-white">
                         <div className="flex justify-between items-center mb-0.5">
                             <div className="flex items-center space-x-1.5 overflow-hidden">
                                 <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 ${currentItem?.isOwned ? 'bg-gray-200 text-gray-600' : currentItem?.isCart ? 'bg-amber-100 text-amber-700' : 'bg-blue-50 text-blue-600'}`}>
                                     {categoryLabels[category]}
                                 </span>
-                                <span className="text-[9px] text-gray-400 font-sans truncate">{currentItem?.id || '----'}</span>
+                                {/* 若為通用商品，不顯示貨號 */}
+                                {!currentItem?.id?.startsWith('own-') && (
+                                    <span className="text-[9px] text-gray-400 font-sans truncate">{currentItem?.id || '----'}</span>
+                                )}
                             </div>
                             <button onClick={onToggleLock} disabled={isSpinning || !currentItem} className={`p-1 -mr-1 rounded-full transition-colors flex-shrink-0 focus:outline-none ${isLocked ? 'text-orange-500 bg-orange-50' : 'text-gray-400 hover:bg-gray-100'} disabled:opacity-50`} title="鎖定/解除鎖定">
                                 {isLocked ? <LockIcon /> : <UnlockIcon />}
                             </button>
                         </div>
 
-                        <div className="mb-0.5 ml-1">
+                        <div className="mb-0.5">
                             <h4 className="text-[11px] font-bold text-gray-800 line-clamp-2 leading-snug">{currentItem?.name || '---'}</h4>
                         </div>
 
-                        <div className="flex justify-between items-end mt-0.5 ml-1">
+                        <div className="flex justify-between items-end mt-0.5">
                             {currentItem?.isOwned ? (
                                 <span className="text-[11px] font-black text-gray-400 font-sans tracking-tighter">免算錢</span>
                             ) : (
@@ -211,7 +214,7 @@
                                     ${(currentItem?.price || 0).toLocaleString()}
                                 </span>
                             )}
-                            {currentItem?.id && (
+                            {currentItem?.id && !currentItem.id.startsWith('own-') && (
                                 <a 
                                     href={`https://www.decathlon.tw/${currentItem.id}/1769`} 
                                     target="_blank" 
@@ -249,9 +252,6 @@
             const [catalogGenders, setCatalogGenders] = useState(['men', 'women', 'kids']);
             const [catalogScenario, setCatalogScenario] = useState('all');
             const [presetItems, setPresetItems] = useState([]); 
-            const [presetInputCat, setPresetInputCat] = useState('top');
-            const [presetInputId, setPresetInputId] = useState('');
-            const [presetType, setPresetType] = useState('owned'); 
             const [toast, setToast] = useState("");
 
             const [filteredDb, setFilteredDb] = useState(null);
@@ -262,6 +262,14 @@
             
             const [catalogActiveTab, setCatalogActiveTab] = useState('all');
             const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+
+            // --- 意見回饋相關 State ---
+            const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+            const [spinCount, setSpinCount] = useState(0);
+            const [hasPoppedUpFeedback, setHasPoppedUpFeedback] = useState(false);
+            const [feedbackRating, setFeedbackRating] = useState(0);
+            const [feedbackText, setFeedbackText] = useState("");
+            const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
             useEffect(() => {
                 if (!GOOGLE_SHEET_CSV_URL) {
@@ -359,24 +367,57 @@
 
             const showMsg = (m) => { setToast(m); setTimeout(() => setToast(""), 3000); };
 
-            const handleAddPreset = (e) => {
+            // --- 提交意見回饋至 Google Forms ---
+            const handleSubmitFeedback = async (e) => {
                 e.preventDefault();
-                if (!presetInputId.trim()) return showMsg("請輸入商品貨號！");
-                if (presetItems.some(i => i.id === presetInputId.trim())) return showMsg("已經加入過這個商品了！");
-                if (presetItems.some(i => i.category === presetInputCat)) return showMsg(`每個分類只能加入一件預設商品喔！`);
-                
-                let foundName = "我的專屬裝備";
-                let foundPrice = 999;
-                if (dbData) {
-                    Object.values(dbData).forEach(catItems => {
-                        const item = catItems.find(i => i.id === presetInputId.trim());
-                        if (item) { foundName = item.name; foundPrice = item.price; }
-                    });
-                }
+                if (!feedbackRating) return showMsg("請先選擇一個評分喔！");
 
-                setPresetItems([...presetItems, { category: presetInputCat, id: presetInputId.trim(), name: foundName, type: presetType, realPrice: foundPrice }]);
-                setPresetInputId('');
-                showMsg(`已加入: ${foundName}`);
+                setIsSubmittingFeedback(true);
+
+                // ⚠️ 請替換為您自己的 Google 表單資訊
+                const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSegsnsHKiBG2t4i-jzHyb2_TPlQzwBqUv3PxnITNWEuA_gsXw/formResponse";
+                const ENTRY_RATING = "entry.943868622"; // 替換為「評分」欄位的 ID
+                const ENTRY_TEXT = "entry.1211881642"; // 替換為「建議文字」欄位的 ID
+
+                const formData = new FormData();
+                formData.append(ENTRY_RATING, feedbackRating);
+                formData.append(ENTRY_TEXT, feedbackText);
+
+                try {
+                    // 使用 no-cors 模式背景送出，避免跨網域問題
+                    await fetch(GOOGLE_FORM_URL, { method: 'POST', mode: 'no-cors', body: formData });
+                    showMsg("收到！感謝您的回饋 ❤️");
+                    setIsFeedbackModalOpen(false);
+                    setFeedbackRating(0);
+                    setFeedbackText("");
+                } catch (error) {
+                    showMsg("感謝您的回饋 ❤️ (已紀錄)");
+                    setIsFeedbackModalOpen(false);
+                } finally {
+                    setIsSubmittingFeedback(false);
+                }
+            };
+
+            // 💡 包含邏輯：預設全選，點選後排除（加入已自備/無需推薦）
+            const toggleGenericPreset = (cat) => {
+                const genericId = `own-${cat}`;
+                const existingIdx = presetItems.findIndex(i => i.category === cat && i.id === genericId);
+                
+                if (existingIdx >= 0) {
+                    setPresetItems(presetItems.filter(i => i.id !== genericId));
+                    showMsg(`已將 ${categoryLabels[cat]} 加入推薦清單`);
+                } else {
+                    const newPresets = presetItems.filter(i => i.category !== cat);
+                    newPresets.push({
+                        category: cat,
+                        id: genericId,
+                        name: "🙋‍♂️ 已自備 / 無需推薦",
+                        type: 'owned',
+                        realPrice: 0
+                    });
+                    setPresetItems(newPresets);
+                    showMsg(`已排除 ${categoryLabels[cat]}`);
+                }
             };
 
             const handleRemovePreset = (id) => setPresetItems(presetItems.filter(i => i.id !== id));
@@ -445,7 +486,9 @@
                     const customItem = {
                         id: preset.id, name: preset.name, price: preset.type === 'owned' ? 0 : preset.realPrice, 
                         isOwned: preset.type === 'owned', isCart: preset.type === 'cart',
-                        img: `https://product-picture.decathlon.cn/model/${preset.id}.jpg?f=1000`
+                        img: preset.id.startsWith('own-') 
+                            ? `https://placehold.co/400x400/eeeeee/999999?text=${encodeURIComponent('無需推薦')}`
+                            : `https://product-picture.decathlon.cn/model/${preset.id}.jpg?f=1000`
                     };
                     newDb[preset.category] = [customItem, ...newDb[preset.category].filter(i => i.id !== preset.id)];
                 });
@@ -471,6 +514,27 @@
                 setView('slot');
             };
 
+            const addCatalogItemToSlot = (item, cat, type) => {
+                const newPresets = presetItems.filter(i => i.category !== cat);
+                newPresets.push({
+                    category: cat,
+                    id: item.id,
+                    name: item.name,
+                    type: type,
+                    realPrice: item.price
+                });
+                
+                setPresetItems(newPresets);
+                
+                const newDb = generateFilteredDb(scenario, targetGender, newPresets);
+                setFilteredDb(newDb);
+                
+                setLocked(prev => ({ ...prev, [cat]: true }));
+                setSelections(prev => ({ ...prev, [cat]: 0 }));
+                
+                setView('slot');
+            };
+
             const currentTotal = (filteredDb && view === 'slot') ? categoryOrder.reduce((sum, cat) => {
                 const item = filteredDb[cat][selections[cat]];
                 return sum + (item ? item.price : 0);
@@ -482,6 +546,18 @@
 
             const handleSpinAll = () => {
                 if (isAnySpinning || !filteredDb) return;
+
+                // --- 彩蛋：點擊5次隨機搭配後，自動跳出回饋視窗 ---
+                setSpinCount(prev => {
+                    const newCount = prev + 1;
+                    if (newCount === 5 && !hasPoppedUpFeedback) {
+                        setTimeout(() => {
+                            setIsFeedbackModalOpen(true);
+                            setHasPoppedUpFeedback(true);
+                        }, 1800); // 確保在轉輪動畫結束後才彈出
+                    }
+                    return newCount;
+                });
 
                 let lockedCost = 0;
                 categoryOrder.forEach(cat => {
@@ -538,12 +614,6 @@
                 });
             };
 
-            const returnToSlot = (newLocks = null, newSelections = null) => {
-                if (newLocks) setLocked(newLocks);
-                if (newSelections) setSelections(newSelections);
-                setView('slot');
-            };
-
             const catalogItems = useMemo(() => {
                 if (!dbData) return null;
                 return generateFilteredDb(catalogScenario, catalogGenders, []); 
@@ -553,6 +623,14 @@
                 if (!dbData) return null;
                 return Object.values(dbData).flat().find(item => item.id === id);
             }, [dbData]);
+
+            // --- 重用的小組件：意見回饋按鈕 ---
+            // 💡 統一尺寸為 30x30
+            const FeedbackHeaderBtn = () => (
+                <button onClick={() => setIsFeedbackModalOpen(true)} className="p-1.5 w-[30px] h-[30px] flex items-center justify-center -mr-1 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors focus:outline-none" title="給點建議">
+                    <MessageIcon />
+                </button>
+            );
 
             // --- 底部 App 導覽列組件 ---
             const BottomNav = () => (
@@ -598,22 +676,77 @@
                 );
             }
 
-            // --- 視圖 0：線上靈感雜誌 (Lookbook) ---
+            // ================== 主要渲染區塊 ==================
+
+            const renderFeedbackModal = () => {
+                if (!isFeedbackModalOpen) return null;
+                return (
+                    <div className="absolute inset-0 z-[100] flex flex-col justify-end bg-black/60 backdrop-blur-[2px] transition-all overflow-hidden">
+                        <div className="w-full bg-white rounded-t-3xl p-5 shadow-2xl modal-enter max-h-[85vh] flex flex-col">
+                            <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-3 flex-shrink-0">
+                                <h3 className="text-sm font-black text-gray-800 flex items-center">
+                                    <MessageIcon /> <span className="ml-1.5">告訴我們您的想法</span>
+                                </h3>
+                                <button onClick={() => setIsFeedbackModalOpen(false)} className="p-1 text-gray-400 hover:text-red-500 transition-colors focus:outline-none"><XIcon /></button>
+                            </div>
+                            
+                            <div className="mb-5 flex flex-col items-center">
+                                {/* 💡 修改意見回饋文案 */}
+                                <p className="text-xs font-bold text-gray-500 mb-3 text-center">您喜歡這個互動平台嗎？</p>
+                                <div className="flex space-x-3">
+                                    {[{score:1, emoji:'😡'}, {score:2, emoji:'🙁'}, {score:3, emoji:'😐'}, {score:4, emoji:'🙂'}, {score:5, emoji:'😍'}].map(item => (
+                                        <button 
+                                            key={item.score} 
+                                            onClick={() => setFeedbackRating(item.score)} 
+                                            className={`text-3xl transition-transform transform active:scale-90 focus:outline-none ${feedbackRating === item.score ? 'scale-125 drop-shadow-md grayscale-0' : 'grayscale opacity-50 hover:grayscale-0 hover:opacity-100'}`}
+                                        >
+                                            {item.emoji}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div className="mb-6">
+                                <textarea 
+                                    value={feedbackText} 
+                                    onChange={(e) => setFeedbackText(e.target.value)} 
+                                    placeholder="(選填) 有什麼我們可以做得更好，或是找不到的裝備嗎？" 
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-none h-24"
+                                ></textarea>
+                            </div>
+
+                            <button 
+                                onClick={handleSubmitFeedback} 
+                                disabled={isSubmittingFeedback || feedbackRating === 0} 
+                                className={`w-full py-4 text-white rounded-xl font-black text-sm tracking-widest uppercase transition-all shadow-lg flex-shrink-0 focus:outline-none ${isSubmittingFeedback || feedbackRating === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:scale-95'}`}
+                            >
+                                {isSubmittingFeedback ? '傳送中...' : '送出回饋'}
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
             if (view === 'magazine') {
                 return (
                     <div className="h-[100dvh] bg-gray-50 flex justify-center overflow-hidden relative">
+                        {renderFeedbackModal()}
+                        {toast && <div className="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 toast-enter bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-xl">{toast}</div>}
                         <div className="w-full max-w-md bg-white h-full shadow-2xl relative flex flex-col">
                             <div className="bg-white px-4 py-3 shadow-sm z-20 flex-shrink-0 flex justify-between items-center border-b border-gray-200">
-                                <div className="text-center w-full">
+                                {/* 💡 統一左側佔位寬度為 30px */}
+                                <div className="w-[30px]"></div>
+                                <div className="text-center w-full px-2">
                                     <h1 className="text-sm font-black text-gray-800 tracking-widest uppercase">凹逗穿搭靈感誌</h1>
                                     <p className="text-[10px] text-blue-600 font-bold mt-0.5 tracking-widest">OUTDOOR LOOKBOOK</p>
                                 </div>
+                                <FeedbackHeaderBtn />
                             </div>
 
                             <div className="flex-1 overflow-y-auto no-scrollbar pb-6">
                                 {lookbookData.length > 0 ? lookbookData.map(look => (
                                     <div key={look.id} className="mb-8 bg-white border-b border-gray-100 pb-8">
-                                        <div className="w-full aspect-[3/4] bg-gray-100 relative overflow-hidden">
+                                        <div className="w-full aspect-[1/1.414] bg-gray-100 relative overflow-hidden">
                                             <img src={look.coverImg} alt={look.title} className="w-full h-full object-cover" />
                                             <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/60 to-transparent p-5 pt-6">
                                                 <h2 className="text-2xl font-black text-white tracking-wide drop-shadow-lg">{look.title}</h2>
@@ -627,18 +760,18 @@
                                             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">此穿搭包含以下商品：</h3>
                                             <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-2 pr-4 snap-x">
                                                 {look.productIds.map(productId => {
-                                                    const item = getProductInfo(productId);
-                                                    if (!item) return null; 
+                                                    const itemInfo = getProductInfo(productId);
+                                                    if (!itemInfo) return null; 
                                                     return (
                                                         <div key={productId} className="flex-shrink-0 w-32 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col snap-start">
                                                             <div className="w-full aspect-square bg-gray-50 relative flex items-center justify-center overflow-hidden">
-                                                                <img src={item.img} className="w-full h-[100%] object-contain mix-blend-multiply" onError={(e) => { e.target.src = 'https://placehold.co/400x400/eeeeee/999999?text=無圖片'; }} />
+                                                                <img src={itemInfo.img} className="w-full h-[100%] object-contain mix-blend-multiply" onError={(e) => { e.target.src = 'https://placehold.co/400x400/eeeeee/999999?text=無圖片'; }} />
                                                             </div>
                                                             <div className="p-2.5 flex flex-col flex-1 border-t border-gray-50">
-                                                                <h4 className="text-[11px] font-bold text-gray-800 line-clamp-2 leading-snug mb-0.5">{item.name}</h4>
-                                                                <p className="text-[9px] text-gray-400 font-sans mb-1">{item.id}</p>
-                                                                <p className="text-[13px] font-black text-gray-900 font-price tracking-tighter mb-2">${(item.price || 0).toLocaleString()}</p>
-                                                                <a href={`https://www.decathlon.tw/${item.id}/1769`} target="_blank" rel="noopener noreferrer" className="mt-auto block text-center text-[10px] bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white py-1.5 rounded-md font-bold transition-colors focus:outline-none">
+                                                                <h4 className="text-[11px] font-bold text-gray-800 line-clamp-2 leading-snug mb-0.5">{itemInfo.name}</h4>
+                                                                <p className="text-[9px] text-gray-400 font-sans mb-1">{itemInfo.id}</p>
+                                                                <p className="text-[13px] font-black text-gray-900 font-price tracking-tighter mb-2">${(itemInfo.price || 0).toLocaleString()}</p>
+                                                                <a href={`https://www.decathlon.tw/${itemInfo.id}/1769`} target="_blank" rel="noopener noreferrer" className="mt-auto block text-center text-[10px] bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white py-1.5 rounded-md font-bold transition-colors focus:outline-none">
                                                                     查看商品詳情
                                                                 </a>
                                                             </div>
@@ -677,21 +810,22 @@
                 );
             }
 
-            // --- 視圖 1：設定頁 ---
             if (view === 'setup') {
                 return (
                     <div className="h-[100dvh] bg-gray-50 flex justify-center overflow-hidden relative">
+                        {renderFeedbackModal()}
                         {toast && <div className="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 toast-enter bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-xl">{toast}</div>}
 
                         <div className="w-full max-w-md bg-white h-full shadow-2xl relative flex flex-col">
                             
                             <div className="bg-white px-4 py-3 shadow-sm z-20 flex-shrink-0 flex justify-between items-center border-b border-gray-200">
-                                <div className="w-8"></div>
-                                <div className="text-center w-full">
+                                {/* 💡 統一左側佔位寬度為 30px */}
+                                <div className="w-[30px]"></div>
+                                <div className="text-center w-full px-2">
                                     <h1 className="text-sm font-black text-gray-800 tracking-widest uppercase">登山健行裝備拉霸機</h1>
                                     <p className="text-[10px] text-blue-600 font-bold mt-0.5 tracking-widest">你的凹逗穿搭好幫手</p>
                                 </div>
-                                <div className="w-8"></div>
+                                <FeedbackHeaderBtn />
                             </div>
 
                             <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-3 pb-6">
@@ -738,36 +872,50 @@
                                 </div>
 
                                 <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                    <h2 className="text-[11px] font-bold text-gray-800 mb-2 flex justify-between items-end">
-                                        <span className="flex items-center"><span className="w-1 h-2.5 bg-blue-600 rounded-full mr-1.5"></span>預先鎖定特定裝備</span>
+                                    <h2 className="text-[11px] font-bold text-gray-800 mb-1 flex items-center">
+                                        <span className="w-1 h-2.5 bg-blue-600 rounded-full mr-1.5"></span>你需要哪些裝備建議呢？
                                     </h2>
+                                    <p className="text-[10px] text-gray-500 mb-3 leading-relaxed">
+                                        預設提供全套裝備建議。若您已自備或不需要某項裝備，請點擊取消勾選，系統配對時將自動跳過且不計入預算。
+                                    </p>
                                     
-                                    <form onSubmit={handleAddPreset} className="mb-2 bg-gray-50 border border-gray-200 rounded-xl p-2">
-                                        <div className="flex bg-gray-200 p-1 rounded-lg mb-2">
-                                            <button type="button" onClick={() => setPresetType('owned')} className={`flex-1 py-1 text-[10px] font-bold rounded-md focus:outline-none ${presetType === 'owned' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}>✅ 已購買（免計價）</button>
-                                            <button type="button" onClick={() => setPresetType('cart')} className={`flex-1 py-1 text-[10px] font-bold rounded-md focus:outline-none ${presetType === 'cart' ? 'bg-white shadow-sm text-amber-600' : 'text-gray-500 hover:text-gray-700'}`}>🛒 待購買（需計價）</button>
-                                        </div>
-                                        
-                                        <div className="flex space-x-1.5">
-                                            <select value={presetInputCat} onChange={(e)=>setPresetInputCat(e.target.value)} className="w-16 bg-white border border-gray-300 rounded-lg px-1 py-1 text-[10px] text-gray-700 font-bold focus:outline-none">
-                                                {categoryOrder.map(cat => <option key={cat} value={cat}>{categoryLabels[cat]}</option>)}
-                                            </select>
-                                            <input type="number" value={presetInputId} onChange={(e)=>setPresetInputId(e.target.value)} placeholder="輸入貨號，如無請輸入任意數字替代" className="flex-1 bg-white border border-gray-300 rounded-lg px-2 py-1 text-[10px] focus:outline-none" />
-                                            <button type="submit" className="bg-blue-600 text-white px-3 rounded-lg text-[10px] font-bold hover:bg-blue-800 transition-colors focus:outline-none">加入</button>
-                                        </div>
-                                    </form>
+                                    <div className="flex flex-wrap gap-1.5 mb-3">
+                                        {categoryOrder.map(cat => {
+                                            const isNotNeeded = presetItems.some(i => i.category === cat && i.id === `own-${cat}`);
+                                            const isNeeded = !isNotNeeded;
+                                            return (
+                                                <button 
+                                                    key={cat} 
+                                                    onClick={() => toggleGenericPreset(cat)}
+                                                    className={`flex-1 min-w-[28%] py-2 rounded-xl text-[11px] font-bold border-2 transition-all focus:outline-none ${isNeeded ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-200 text-gray-400 bg-gray-50 hover:border-gray-300 opacity-70'}`}
+                                                >
+                                                    {isNeeded ? '✅ ' : ''}{categoryLabels[cat]}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
 
-                                    <div className="space-y-1.5 max-h-20 overflow-y-auto pr-1">
+                                    <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
                                         {presetItems.length === 0 ? (
-                                            <div className="text-center py-2 text-[9px] text-gray-400 border border-dashed border-gray-200 rounded-lg">尚無鎖定任何裝備</div>
+                                            <div className="text-center py-2 text-[9px] text-gray-400 border border-dashed border-gray-200 rounded-lg">
+                                                目前選擇由系統自動推薦全套裝備
+                                            </div>
                                         ) : (
                                             presetItems.map(item => (
                                                 <div key={item.id} className={`flex justify-between items-center border rounded-lg p-1.5 px-2 ${item.type === 'owned' ? 'bg-white border-gray-200' : 'bg-amber-50 border-amber-200'}`}>
                                                     <div className="flex items-center space-x-1.5 overflow-hidden">
                                                         <span className={`text-[8px] text-white px-1 py-0.5 rounded font-bold flex-shrink-0 ${item.type === 'owned' ? 'bg-gray-500' : 'bg-amber-500'}`}>{categoryLabels[item.category]}</span>
-                                                        <span className="text-[9px] font-bold text-gray-800 truncate leading-none">{item.name}</span>
+                                                        <span className="text-[9px] font-bold text-gray-800 truncate leading-none">
+                                                            {item.name} {item.type === 'cart' ? `($${(item.realPrice || 0).toLocaleString()})` : ''}
+                                                        </span>
                                                     </div>
-                                                    <button onClick={() => handleRemovePreset(item.id)} className="text-gray-400 hover:text-red-500 flex-shrink-0 transition-colors focus:outline-none"><XIcon /></button>
+                                                    <button onClick={() => {
+                                                        if(item.id.startsWith('own-')) {
+                                                            toggleGenericPreset(item.category);
+                                                        } else {
+                                                            handleRemovePreset(item.id);
+                                                        }
+                                                    }} className="text-gray-400 hover:text-red-500 flex-shrink-0 transition-colors focus:outline-none"><XIcon /></button>
                                                 </div>
                                             ))
                                         )}
@@ -792,12 +940,12 @@
                 );
             }
 
-            // --- 視圖 3：商品總覽清單 (Catalog) ---
             if (view === 'catalog') {
                 const visibleCategories = catalogActiveTab === 'all' ? categoryOrder : [catalogActiveTab];
 
                 return (
                     <div className="h-[100dvh] bg-gray-50 flex justify-center overflow-hidden relative">
+                        {renderFeedbackModal()}
                         {toast && <div className="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 toast-enter bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-xl">{toast}</div>}
                         
                         <div className="w-full max-w-md bg-gray-50 h-full shadow-2xl relative flex flex-col overflow-hidden">
@@ -849,12 +997,16 @@
                                 </div>
                             )}
 
-                            {/* Header (💡 字體大小已調整與靈感誌相同) */}
+                            {/* Header */}
                             <div className="bg-white shadow-sm z-20 flex-shrink-0 border-b border-gray-200">
                                 <div className="px-4 py-3 flex justify-between items-center">
-                                    <div className="w-8"></div>
-                                    <div className="text-center w-full">
-                                        <h1 className="text-sm font-black text-gray-800 tracking-widest uppercase">全品項裝備型錄</h1>
+                                    {/* 💡 統一左側按鈕尺寸 */}
+                                    <button onClick={() => setIsFilterModalOpen(true)} className="p-1.5 w-[30px] h-[30px] flex items-center justify-center -ml-1 rounded-full text-gray-500 bg-gray-100 hover:bg-blue-100 hover:text-blue-600 transition-colors focus:outline-none" title="進階篩選">
+                                        <FilterIcon />
+                                    </button>
+                                    <div className="text-center w-full px-2">
+                                        {/* 💡 修改型錄標題 */}
+                                        <h1 className="text-sm font-black text-gray-800 tracking-widest uppercase">登山健行裝備型錄</h1>
                                         <p className="text-[10px] text-blue-600 font-bold mt-0.5 tracking-widest">
                                             {catalogScenario === 'all' ? '通用' : scenarioTips[catalogScenario].title.split(' ')[1].split('【')[0]} | {catalogGenders.length === 3 ? '全部對象' : catalogGenders.map(g => g === 'men' ? '男' : g === 'women' ? '女' : '兒童').sort((a,b) => {
                                                 const order = {'men': 0, 'women': 1, 'kids': 2};
@@ -862,9 +1014,7 @@
                                             }).join('/')}
                                         </p>
                                     </div>
-                                    <button onClick={() => setIsFilterModalOpen(true)} className="p-1.5 -mr-1 rounded-full text-gray-500 bg-gray-100 hover:bg-blue-100 hover:text-blue-600 transition-colors focus:outline-none" title="進階篩選">
-                                        <FilterIcon />
-                                    </button>
+                                    <FeedbackHeaderBtn />
                                 </div>
 
                                 {/* 分類標籤 */}
@@ -893,30 +1043,28 @@
                                                         <div className="w-full aspect-square bg-gray-50 relative flex items-center justify-center overflow-hidden">
                                                             <img src={item.img} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" onError={(e) => { e.target.src = 'https://placehold.co/400x400/eeeeee/999999?text=無圖片'; }} />
                                                             {item.isOwned && <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">✅ 已擁有</div>}
-                                                            {item.isCart && <div className="absolute inset-0 bg-amber-900/30 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">🛒 購物車</div>}
+                                                            {item.isCart && <div className="absolute inset-0 bg-amber-900/30 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">❤️ 待購清單</div>}
                                                         </div>
                                                         <div className="p-2.5 flex flex-col flex-1 bg-white">
                                                             <h4 className="text-[11px] font-bold text-gray-800 line-clamp-2 leading-snug mb-0.5">{item.name}</h4>
                                                             <p className="text-[9px] text-gray-400 font-sans mb-1">{item.id}</p>
                                                             <p className="text-[13px] font-black text-gray-800 font-price mb-2">${(item.price || 0).toLocaleString()}</p>
-                                                            <button 
-                                                                onClick={() => {
-                                                                    let currentDb = filteredDb || generateFilteredDb(scenario, targetGender);
-                                                                    let targetIdx = currentDb[cat].findIndex(i => i.id === item.id);
-                                                                    if (targetIdx === -1) {
-                                                                        const updatedCatList = [item, ...currentDb[cat]];
-                                                                        const updatedDb = { ...currentDb, [cat]: updatedCatList };
-                                                                        setFilteredDb(updatedDb);
-                                                                        targetIdx = 0;
-                                                                    } else {
-                                                                        setFilteredDb(currentDb);
-                                                                    }
-                                                                    returnToSlot({...locked, [cat]: true}, {...selections, [cat]: targetIdx});
-                                                                }}
-                                                                className="mt-auto w-full py-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white text-[10px] font-bold rounded-lg transition-colors flex justify-center items-center focus:outline-none"
-                                                            >
-                                                                加入拉霸機
-                                                            </button>
+                                                            
+                                                            <div className="mt-auto grid grid-cols-2 gap-1.5">
+                                                                <button 
+                                                                    onClick={() => addCatalogItemToSlot(item, cat, 'owned')}
+                                                                    className="w-full py-1.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-[10px] font-bold rounded-lg transition-colors flex justify-center items-center focus:outline-none shadow-sm"
+                                                                >
+                                                                    ✅ 已擁有
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => addCatalogItemToSlot(item, cat, 'cart')}
+                                                                    className="w-full py-1.5 bg-blue-600 text-white hover:bg-blue-700 text-[10px] font-bold rounded-lg transition-colors flex justify-center items-center focus:outline-none shadow-sm"
+                                                                >
+                                                                    ❤️ 加入待購
+                                                                </button>
+                                                            </div>
+
                                                         </div>
                                                     </div>
                                                 );
@@ -937,46 +1085,48 @@
             }
 
             // --- 視圖 2：滿版動態拉霸機 ---
-            const cartCount = presetItems.filter(i => i.type === 'cart').length;
             const ownedCount = presetItems.filter(i => i.type === 'owned').length;
 
             return (
                 <div className="h-[100dvh] bg-gray-50 flex justify-center overflow-hidden relative">
+                    {renderFeedbackModal()}
                     {toast && <div className="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 toast-enter bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-xl">{toast}</div>}
                     
                     <div className="w-full max-w-md bg-gray-50 h-full shadow-2xl relative flex flex-col">
                         
                         {/* 頂部 Header */}
                         <div className="bg-white px-4 py-3 shadow-sm z-20 flex-shrink-0 flex justify-between items-center border-b border-gray-200">
+                            {/* 💡 統一左側返回鍵尺寸 */}
                             <button onClick={() => {
                                 const syncedPresets = [];
                                 categoryOrder.forEach(cat => {
                                     if (locked[cat] && filteredDb && filteredDb[cat]) {
                                         const item = filteredDb[cat][selections[cat]];
                                         if (item) {
+                                            const existingPreset = presetItems.find(p => p.id === item.id);
                                             syncedPresets.push({
                                                 category: cat,
                                                 id: item.id,
                                                 name: item.name,
-                                                type: item.isOwned ? 'owned' : 'cart',
-                                                realPrice: item.price
+                                                type: item.isOwned ? 'owned' : (item.isCart ? 'cart' : 'cart'), 
+                                                realPrice: existingPreset ? existingPreset.realPrice : item.price
                                             });
                                         }
                                     }
                                 });
                                 setPresetItems(syncedPresets);
                                 setView('setup');
-                            }} className="p-2 -ml-2 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors focus:outline-none" title="回到設定">
+                            }} className="p-1.5 w-[30px] h-[30px] flex items-center justify-center -ml-1 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors focus:outline-none" title="回到設定">
                                 <ArrowLeftIcon />
                             </button>
-                            <div className="text-center">
+                            <div className="text-center w-full px-2">
                                 <h1 className="text-sm font-black text-gray-800 tracking-widest uppercase">登山健行裝備拉霸機</h1>
                                 <p className="text-[10px] text-blue-600 font-bold mt-0.5">
                                     ${budget.toLocaleString()} | {targetGender==='all'?'不拘':targetGender==='men'?'男':targetGender==='women'?'女':'童'} | { } 
                                     {scenario==='all'?'通用':scenarioTips[scenario].title.split(' ')[1].split('【')[0]}
                                 </p>
                             </div>
-                            <div className="w-7"></div> 
+                            <FeedbackHeaderBtn />
                         </div>
 
                         <div className="flex-1 flex flex-col justify-center p-2.5 gap-2 overflow-hidden z-10">
@@ -986,7 +1136,16 @@
                                     selectedIndex={selections[cat]} isLocked={locked[cat]}
                                     isSpinning={spinningStates[cat]}
                                     onSelect={(idx) => setSelections(p => ({...p, [cat]: idx}))}
-                                    onToggleLock={() => setLocked(p => ({...p, [cat]: !p[cat]}))}
+                                    onToggleLock={() => {
+                                        const isCurrentlyLocked = locked[cat];
+                                        if (isCurrentlyLocked && filteredDb[cat]) {
+                                            const item = filteredDb[cat][selections[cat]];
+                                            if (item.isOwned || item.isCart || item.id.startsWith('own-')) {
+                                                setPresetItems(prev => prev.filter(i => i.id !== item.id));
+                                            }
+                                        }
+                                        setLocked(p => ({...p, [cat]: !p[cat]}));
+                                    }}
                                 />
                             ))}
                         </div>
@@ -1007,10 +1166,9 @@
                                         </span>
                                     )}
                                     
-                                    {(ownedCount > 0 || cartCount > 0) && (
+                                    {ownedCount > 0 && (
                                         <div className="flex flex-col space-y-0.5 mt-1.5">
-                                            {ownedCount > 0 && <span className="text-[9px] text-gray-500 font-medium">✅ 扣除已購買裝備</span>}
-                                            {cartCount > 0 && <span className="text-[9px] text-amber-600 font-medium">🛒 含購物車鎖定商品</span>}
+                                            <span className="text-[9px] text-gray-500 font-medium">✅ 扣除已購買/自備裝備</span>
                                         </div>
                                     )}
                                 </div>
@@ -1018,7 +1176,7 @@
                                 <button 
                                     onClick={handleSpinAll}
                                     disabled={isAnySpinning}
-                                    className={`flex flex-col items-center justify-center px-5 py-3.5 rounded-xl text-xs font-black tracking-widest text-white shadow-md transition-all transform active:scale-95 uppercase flex-shrink-0 h-[68px] focus:outline-none ${isAnySpinning ? 'bg-gray-300 shadow-none' : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'}`}
+                                    className={`flex flex-col items-center justify-center px-5 py-3.5 rounded-xl text-xs font-black tracking-widest text-white shadow-md transition-all transform active:scale-95 uppercase flex-shrink-0 h-[68px] focus:outline-none ${isAnySpinning ? 'bg-gray-300 shadow-none' : 'bg-blue-600 hover:bg-blue-700'}`}
                                 >
                                     {isAnySpinning ? (
                                         <span className="animate-pulse">隨機搭配中...</span>
