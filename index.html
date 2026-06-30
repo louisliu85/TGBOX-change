@@ -41,15 +41,18 @@
     <!-- 全新輕量化 Header -->
     <div class="pb-4 border-b border-gray-200 flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
-          <i data-lucide="box" class="text-[#3643ba] w-8 h-8"></i>
-          1769 TG & Box<span class="text-[#3643ba]">品項更換表單</span>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-start sm:items-center gap-3">
+          <i data-lucide="box" class="text-[#3643ba] w-8 h-8 shrink-0 mt-0.5 sm:mt-0"></i>
+          <span class="leading-snug">
+            1769 TG & Box
+            <span class="text-[#3643ba] block sm:inline mt-1 sm:mt-0">品項更換表單</span>
+          </span>
         </h1>
         <p class="mt-2 text-gray-500 text-sm">
-          只要有增減品項都請填寫此表單，填完後也要記得更換 CubeInStore 數據
+          只要有增減品項都請填寫此表單，填完後也要記得更換 CubeInStore 數據唷！
         </p>
       </div>
-      <div id="itemCount" class="text-sm text-gray-400 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
+      <div id="itemCount" class="text-sm text-gray-400 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm self-start md:self-auto shrink-0">
         共 0 件商品
       </div>
     </div>
@@ -162,7 +165,7 @@
         <!-- 最終表單資料 -->
         <div class="space-y-3 mb-8">
           <label class="block text-sm font-semibold text-gray-600">
-            最終輸出格式 (自動生成)
+            最終輸出格式（自動生成）
           </label>
           <textarea
             id="finalTextarea"
