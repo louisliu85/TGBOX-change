@@ -1,1204 +1,662 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>凹逗穿搭靈感誌</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1769 TG & Box 品項更換表單</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { 
-                        // 貨號與名稱維持此順序
-                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
-                        // 價格優先使用 Decathlon VF
-                        price: ['"Decathlon VF"', 'Inter', 'Noto Sans TC', 'sans-serif']
-                    },
-                    colors: {
-                        blue: {
-                            50: '#edf0fd', 100: '#dfe4fa', 200: '#c5cbf6', 300: '#9eaaf0',
-                            400: '#7281e8', 500: '#4f5bdd', 600: '#3643ba', 700: '#2c35a6',
-                            800: '#262d87', 900: '#242a6c',
-                        },
-                        amber: { 500: '#f59e0b', 600: '#d97706' }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Dependencies -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <!-- 引入 HTML5 QR Code 掃描器 -->
+  <script src="https://unpkg.com/html5-qrcode" async crossorigin="anonymous"></script>
 
-    <style>
-        @font-face {
-            font-family: "Decathlon VF";
-            /* 請在此處 src 的 url("") 填入您的字體檔案路徑 */
-            src: url("https://www.decathlon.tw/fonts/Decathlon-VF.woff2") format("woff2");
-            font-weight: 100 900;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        /* 已移除 fade-in 淡入動畫 */
-        @keyframes verticalBlurSpin {
-            0% { filter: blur(0px); transform: translateY(0); }
-            25% { filter: blur(2px); transform: translateY(-10px); opacity: 0.8;}
-            50% { filter: blur(4px); transform: translateY(10px); opacity: 0.5;}
-            75% { filter: blur(2px); transform: translateY(-10px); opacity: 0.8;}
-            100% { filter: blur(0px); transform: translateY(0); }
-        }
-        .spinning-effect { animation: verticalBlurSpin 0.1s infinite linear; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translate(-50%, 10px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
-        }
-        .toast-enter { animation: fadeUp 0.3s ease-out forwards; }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(100%); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .modal-enter { animation: slideUp 0.3s ease-out forwards; }
-
-        body {
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-    </style>
+  <!-- 自訂卷軸與實用樣式 -->
+  <style>
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 99px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .d-none {
+      display: none !important;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans antialiased selection:bg-blue-100">
-    <div id="root"></div>
+<body class="min-h-screen bg-[#f8fafc] py-10 px-4 sm:px-6 lg:px-8 font-sans relative">
+  
+  <div class="max-w-4xl mx-auto space-y-6">
+    
+    <!-- 全新輕量化 Header -->
+    <div class="pb-4 border-b border-gray-200 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+          <i data-lucide="box" class="text-[#3643ba] w-8 h-8"></i>
+          1769 TG & Box<span class="text-[#3643ba]">品項更換表單</span>
+        </h1>
+        <p class="mt-2 text-gray-500 text-sm">
+          只要有增減品項都請填寫此表單，填完後也要記得更換 CubeInStore 數據
+        </p>
+      </div>
+      <div id="itemCount" class="text-sm text-gray-400 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
+        共 0 件商品
+      </div>
+    </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo, useCallback } = React;
+    <form id="mainForm" class="space-y-6">
+      
+      <!-- 區塊 1：商區設定 -->
+      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
+          <i data-lucide="map-pin" class="text-[#3643ba] w-5 h-5"></i>
+          1. 商區設定
+        </h2>
+        <p class="text-sm text-gray-500 mb-4">
+          請選擇商區類型及編號。
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-3">
+          <!-- 類型選擇 -->
+          <select id="locType" class="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none bg-gray-50/50 min-w-[140px]">
+            <option value="">請選擇類型</option>
+            <option value="TG">TG</option>
+            <option value="Box">Box</option>
+          </select>
 
-        const categoryLabels = { hat: "帽子", top: "衣服", bottom: "褲子", shoes: "鞋子", accessory: "配件" };
-        const categoryOrder = ["hat", "top", "bottom", "shoes", "accessory"];
+          <!-- TG 專用選單 (預設隱藏) -->
+          <div id="tgSelects" class="flex flex-1 gap-3 d-none">
+            <select id="tgDept" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none bg-gray-50/50">
+              <option value="">選擇部門</option>
+            </select>
+            <span class="flex items-center text-gray-400 font-bold">-</span>
+            <select id="tgNum" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none bg-gray-50/50">
+              <option value="">選擇編號</option>
+            </select>
+          </div>
 
-        // --- 穿搭情境知識庫 ---
-        const scenarioTips = {
-            all: { title: "🌍 綜合通用", text: "依據日常或輕度戶外活動，挑選舒適、好活動且具備基礎機能的服飾。" },
-            trekking: { title: "🥾 登山健行【洋蔥式穿法】", text: "山區氣候多變，建議採用洋蔥式穿法：\n1. 內層：吸濕排汗 (保持身體乾爽)\n2. 中層：刷毛或羽絨 (維持體溫)\n3. 外層：防風防水 (抵禦風雨變化)" },
-            baiyue: { title: "⛰️ 百岳重裝【洋蔥式穿法】", text: "因應氣候變化，建議採用洋蔥式穿法：\n1. 內層：吸濕排汗 (保持身體乾爽)\n2. 中層：刷毛或羽絨 (維持體溫)\n3. 外層：防風防水 (抵禦風雨變化)。\n頭部保暖與高筒專業登山鞋絕對不可少！" },
-            hiking: { title: "🚶 徒步旅行", text: "長時間平地或緩坡徒步，首重透氣排汗與足部舒適支撐，建議選擇輕量化、防曬抗 UV 的裝備。" },
-            island: { title: "🧳 徒步環島", text: "長途跋涉首重雙腳與雙肩！登山鞋與登山包可減輕身體負擔；\n衣著則建議吸濕排汗材質為主，並攜帶輕便易收納的雨衣，應付長時間日曬與多變天候。" },
-            winter: { title: "❄️ 冬季保暖", text: "低溫防寒必備！內層挑選美麗諾羊毛或保暖底層，搭配羽絨中層與防風外層，並注意頭部與四肢的保暖。" }
-        };
+          <!-- Box 專用選單 (預設隱藏) -->
+          <div id="boxSelects" class="flex flex-1 gap-3 d-none">
+            <select id="boxNum" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none bg-gray-50/50">
+              <option value="">選擇 Box 編號</option>
+            </select>
+          </div>
+        </div>
 
-        // --- Icons ---
-        const LockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>;
-        const UnlockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>;
-        const ChevronLeftIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>;
-        const ChevronRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>;
-        const DicesIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><circle cx="15.5" cy="15.5" r="1.5"></circle><circle cx="15.5" cy="8.5" r="1.5"></circle><circle cx="8.5" cy="15.5" r="1.5"></circle></svg>;
-        const XIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
-        // 💡 調整 ArrowLeftIcon 大小為 18x18，與其他 Header Icon 一致
-        const ArrowLeftIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>;
-        const ExternalLinkIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>;
-        const FilterIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>;
-        const BookOpenIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>;
-        const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
-        const MessageIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>;
+        <p id="dataSourceStatus" class="text-xs text-gray-400 mt-3 flex items-center gap-1">
+          <i data-lucide="database" class="w-4 h-4"></i>
+          目前使用系統預設編號資料
+        </p>
+      </div>
 
-        const ToggleBtn = ({ active, onClick, className = "", children }) => (
-            <button type="button" onClick={onClick} className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border-2 transition-all flex items-center justify-center space-x-1 focus:outline-none ${active ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'} ${className}`}>
-                {children}
-            </button>
-        );
+      <!-- 區塊 2：加入商品 -->
+      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
+          <i data-lucide="package-plus" class="text-[#3643ba] w-5 h-5"></i>
+          2. 加入商品 Model Code
+        </h2>
+        <p class="text-sm text-gray-500 mb-4">
+          支援一次貼上多個貨號或使用相機掃描條碼。
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            id="bulkInput"
+            placeholder="貼上貨號，例如：8526140 8516193..."
+            class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none transition-all bg-gray-50/50"
+          />
+          <button
+            type="button"
+            id="btnScan"
+            class="bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-100 px-5 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 shrink-0"
+          >
+            <i data-lucide="camera" class="w-[18px] h-[18px]"></i>
+            掃描
+          </button>
+          <button
+            type="button"
+            id="btnAdd"
+            class="bg-white text-[#3643ba] border-2 border-[#3643ba] hover:bg-[#3643ba] hover:text-white px-6 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 shrink-0"
+          >
+            <i data-lucide="plus" class="w-[18px] h-[18px]"></i>
+            加入
+          </button>
+        </div>
+      </div>
 
-        // --- 拉霸機卡片組件 ---
-        const SlotItem = ({ category, items, selectedIndex, isLocked, isSpinning, onSelect, onToggleLock }) => {
-            const currentItem = items[selectedIndex];
-            const isPresetItem = currentItem?.isOwned || currentItem?.isCart;
-            
-            const [navVisible, setNavVisible] = useState(true);
-            const timerRef = useRef(null);
+      <!-- 區塊 3：預覽與確認 -->
+      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
+          <i data-lucide="check-square" class="text-[#3643ba] w-5 h-5"></i>
+          3. 預覽與確認
+        </h2>
+        <p class="text-sm text-gray-500 mb-4">
+          左右滑動確認商品，點按圖片即可刪除。
+        </p>        
 
-            const showNavTemporarily = () => {
-                setNavVisible(true);
-                if (timerRef.current) clearTimeout(timerRef.current);
-                timerRef.current = setTimeout(() => setNavVisible(false), 3000);
-            };
+        <!-- 圖片預覽區 -->
+        <div class="mb-6">
+          <!-- 有資料時顯示的容器 -->
+          <div id="previewContainer" class="flex overflow-x-auto gap-4 pb-4 custom-scrollbar d-none">
+            <!-- 圖片將由 JavaScript 動態插入於此 -->
+          </div>
+          
+          <!-- 無資料時顯示的空白狀態 -->
+          <div id="emptyState" class="py-12 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400">
+            <i data-lucide="image" class="w-12 h-12 mb-3 opacity-20"></i>
+            <p>尚未加入任何商品</p>
+          </div>
+        </div>
 
-            useEffect(() => {
-                if (!isSpinning && !isLocked && !isPresetItem) showNavTemporarily();
-                else { setNavVisible(false); if (timerRef.current) clearTimeout(timerRef.current); }
-                return () => clearTimeout(timerRef.current);
-            }, [isSpinning, isLocked, isPresetItem, selectedIndex]);
+        <!-- 最終表單資料 -->
+        <div class="space-y-3 mb-8">
+          <label class="block text-sm font-semibold text-gray-600">
+            最終輸出格式 (自動生成)
+          </label>
+          <textarea
+            id="finalTextarea"
+            readonly
+            placeholder="此處將自動填入以空格隔開的商品清單..."
+            class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/80 text-gray-600 outline-none h-24 resize-none font-mono text-sm"
+          ></textarea>
+        </div>
 
-            const handlePrev = (e) => {
-                if (e) e.stopPropagation(); 
-                if (isSpinning || !items || items.length === 0) return;
-                onSelect(selectedIndex === 0 ? items.length - 1 : selectedIndex - 1);
-            };
-            const handleNext = (e) => {
-                if (e) e.stopPropagation();
-                if (isSpinning || !items || items.length === 0) return;
-                onSelect(selectedIndex === items.length - 1 ? 0 : selectedIndex + 1);
-            };
+        <!-- 訊息提示區 (成功/錯誤) -->
+        <div id="statusMessage" class="mb-4 p-4 rounded-xl border flex items-center gap-3 d-none">
+          <!-- 內容由 JS 動態填入 -->
+        </div>
 
-            return (
-                <div className={`flex-1 min-h-0 max-h-[120px] flex bg-white rounded-xl shadow-sm border-2 transition-colors overflow-hidden ${isLocked ? (currentItem?.isOwned ? 'border-gray-300 bg-gray-50' : currentItem?.isCart ? 'border-amber-400 bg-amber-50' : 'border-orange-400 bg-orange-50') : 'border-transparent hover:border-blue-200'}`}>
-                    
-                    <div 
-                        className="h-full aspect-square relative bg-gray-100 flex-shrink-0 flex items-center justify-center border-r border-gray-100 cursor-pointer overflow-hidden"
-                        onClick={showNavTemporarily}
-                    >
-                        {currentItem ? (
-                            <React.Fragment>
-                                <img 
-                                    src={currentItem.img} 
-                                    alt={currentItem.name} 
-                                    onError={(e) => { e.target.src = 'https://placehold.co/400x400/eeeeee/999999?text=無圖片'; }} 
-                                    className={`w-full h-full object-cover mix-blend-multiply transition-all ${isSpinning && !isLocked ? 'spinning-effect opacity-60' : 'opacity-100'}`} 
-                                />
-                                {!isSpinning && !isLocked && (
-                                    <React.Fragment>
-                                        <button onClick={handlePrev} className={`absolute left-1 w-5 h-5 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm text-gray-600 transition-all duration-500 ${navVisible ? 'opacity-90' : 'opacity-0 pointer-events-none'}`}><ChevronLeftIcon /></button>
-                                        <button onClick={handleNext} className={`absolute right-1 w-5 h-5 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm text-gray-600 transition-all duration-500 ${navVisible ? 'opacity-90' : 'opacity-0 pointer-events-none'}`}><ChevronRightIcon /></button>
-                                    </React.Fragment>
-                                )}
-                                {currentItem.isOwned && (
-                                    <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">✅ 已擁有</div>
-                                )}
-                                {currentItem.isCart && (
-                                    <div className="absolute inset-0 bg-amber-900/30 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">❤️ 待購清單</div>
-                                )}
-                                {!isPresetItem && <div className={`absolute bottom-0.5 right-0.5 bg-black/50 text-white text-[7px] px-1 py-0.5 rounded transition-opacity duration-500 ${navVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>{selectedIndex + 1}/{items.length}</div>}
-                            </React.Fragment>
-                        ) : (
-                            <div className="text-[9px] text-gray-400 text-center">無商品</div>
-                        )}
-                    </div>
+        <!-- 送出按鈕 -->
+        <button
+          type="submit"
+          id="submitBtn"
+          disabled
+          class="w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all duration-200 bg-gray-200 text-gray-400 cursor-not-allowed"
+        >
+          <i data-lucide="send" class="w-5 h-5"></i>
+          <span id="submitBtnText">確認無誤，送出資料</span>
+        </button>
+        
+      </div>
+    </form>
+  </div>
 
-                    <div className="flex-1 pt-1.5 pb-2.5 px-2 flex flex-col min-w-0 bg-white">
-                        <div className="flex justify-between items-center mb-0.5">
-                            <div className="flex items-center space-x-1.5 overflow-hidden">
-                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 ${currentItem?.isOwned ? 'bg-gray-200 text-gray-600' : currentItem?.isCart ? 'bg-amber-100 text-amber-700' : 'bg-blue-50 text-blue-600'}`}>
-                                    {categoryLabels[category]}
-                                </span>
-                                {/* 若為通用商品，不顯示貨號 */}
-                                {!currentItem?.id?.startsWith('own-') && (
-                                    <span className="text-[9px] text-gray-400 font-sans truncate">{currentItem?.id || '----'}</span>
-                                )}
-                            </div>
-                            <button onClick={onToggleLock} disabled={isSpinning || !currentItem} className={`p-1 -mr-1 rounded-full transition-colors flex-shrink-0 focus:outline-none ${isLocked ? 'text-orange-500 bg-orange-50' : 'text-gray-400 hover:bg-gray-100'} disabled:opacity-50`} title="鎖定/解除鎖定">
-                                {isLocked ? <LockIcon /> : <UnlockIcon />}
-                            </button>
-                        </div>
+  <!-- =============================== -->
+  <!-- 掃描器 Modal 視窗 -->
+  <!-- =============================== -->
+  <div id="scannerModal" class="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-opacity d-none">
+    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden flex flex-col shadow-2xl">
+      <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+          <i data-lucide="camera" class="text-[#3643ba] w-5 h-5"></i> 
+          掃描商品條碼
+        </h3>
+        <button 
+          type="button"
+          id="btnCloseScanner"
+          class="p-2 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 transition-colors"
+          title="關閉掃描器"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <!-- 相機預覽畫面容器 -->
+      <div class="bg-black relative w-full flex justify-center items-center overflow-hidden min-h-[300px]">
+        <div id="qr-reader" class="w-full"></div>
+      </div>
+      
+      <div id="scanStatusText" class="p-4 text-sm text-center text-gray-700 bg-gray-50 font-medium break-all">
+        請將相機對準商品條碼或 QR Code
+      </div>
+    </div>
+  </div>
 
-                        <div className="mb-0.5">
-                            <h4 className="text-[11px] font-bold text-gray-800 line-clamp-2 leading-snug">{currentItem?.name || '---'}</h4>
-                        </div>
+  <script>
+    // 初始化 Lucide 圖示
+    lucide.createIcons();
 
-                        <div className="flex justify-between items-end mt-0.5">
-                            {currentItem?.isOwned ? (
-                                <span className="text-[11px] font-black text-gray-400 font-sans tracking-tighter">免算錢</span>
-                            ) : (
-                                <span className={`text-[14px] font-black font-price tracking-tighter leading-none ${currentItem?.isCart ? 'text-amber-600' : 'text-gray-900'}`}>
-                                    ${(currentItem?.price || 0).toLocaleString()}
-                                </span>
-                            )}
-                            {currentItem?.id && !currentItem.id.startsWith('own-') && (
-                                <a 
-                                    href={`https://www.decathlon.tw/${currentItem.id}/1769`} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    className="text-[9px] bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white px-1.5 py-0.5 rounded transition-colors flex items-center space-x-0.5 whitespace-nowrap relative top-1 focus:outline-none"
-                                >
-                                    <span>官網連結</span>
-                                    <ExternalLinkIcon />
-                                </a>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
+    // 狀態管理
+    let modelCodes = [];
+    let isSubmitting = false;
 
-        // --- 主應用程式 ---
-        const App = () => {
-            const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR14WxdTycKfRM64qq13BxMrMH7OUOONQFhvr2StbozuNBcwulMwyb9H2Q3_nX9DoKvk4DCDGY5E8x-/pub?output=csv"; 
-            const LOOKBOOK_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR14WxdTycKfRM64qq13BxMrMH7OUOONQFhvr2StbozuNBcwulMwyb9H2Q3_nX9DoKvk4DCDGY5E8x-/pub?gid=378637456&single=true&output=csv"; 
+    // ==========================================
+    // 🔗 Google 表單送出設定區 
+    // ==========================================
+    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfF8Wq565jbS1v6wk8_m0VNFoQn35BP34SLitRFJtpCSNYrRQ/formResponse"; 
+    const ENTRY_LOCATION = "entry.795130238"; 
+    const ENTRY_MODELS = "entry.1574742509";   
 
-            const [dbData, setDbData] = useState(null);
-            const [lookbookData, setLookbookData] = useState([]); 
-            
-            const [isDbLoading, setIsDbLoading] = useState(true);
-            const [dbFatalError, setDbFatalError] = useState(false);
-            const [updateDate, setUpdateDate] = useState('讀取中...'); 
+    // --- 商區編號設定 (Google Sheet 連結) ---
+    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlW93nNOC2e79n_wXpyjoLlFqE3b59yajqBRUt1qGe36yFaG7ImEsL_Nu8uJkrdI3GUuKq9Q08cTTo/pub?gid=427952482&single=true&output=csv"; 
+    
+    let locationConfig = {
+      TG: {
+        "C1": ["1", "2", "3", "4"],
+        "C2": ["1", "2"],
+        "C3": ["1"]
+      },
+      Box: ["B01", "B02", "B03", "B04", "B05"]
+    };
 
-            const [view, setView] = useState('magazine'); 
-            
-            const [budget, setBudget] = useState(4000); 
-            const [scenario, setScenario] = useState('all');
-            
-            const [targetGender, setTargetGender] = useState('all');
-            const [catalogGenders, setCatalogGenders] = useState(['men', 'women', 'kids']);
-            const [catalogScenario, setCatalogScenario] = useState('all');
-            const [presetItems, setPresetItems] = useState([]); 
-            const [toast, setToast] = useState("");
+    // DOM 元素選取
+    const locTypeSelect = document.getElementById('locType');
+    const tgSelects = document.getElementById('tgSelects');
+    const boxSelects = document.getElementById('boxSelects');
+    const tgDeptSelect = document.getElementById('tgDept');
+    const tgNumSelect = document.getElementById('tgNum');
+    const boxNumSelect = document.getElementById('boxNum');
+    const dataSourceStatus = document.getElementById('dataSourceStatus');
+    
+    const bulkInput = document.getElementById('bulkInput');
+    const btnAdd = document.getElementById('btnAdd');
+    const btnScan = document.getElementById('btnScan');
+    const previewContainer = document.getElementById('previewContainer');
+    const emptyState = document.getElementById('emptyState');
+    const finalTextarea = document.getElementById('finalTextarea');
+    const itemCount = document.getElementById('itemCount');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const statusMessage = document.getElementById('statusMessage');
+    const mainForm = document.getElementById('mainForm');
 
-            const [filteredDb, setFilteredDb] = useState(null);
-            const [selections, setSelections] = useState({ hat: 0, top: 0, bottom: 0, shoes: 0, accessory: 0 });
-            const [locked, setLocked] = useState({ hat: false, top: false, bottom: false, shoes: false, accessory: false });
-            const [spinningStates, setSpinningStates] = useState({ hat: false, top: false, bottom: false, shoes: false, accessory: false });
-            const [isOverBudget, setIsOverBudget] = useState(false);
-            
-            const [catalogActiveTab, setCatalogActiveTab] = useState('all');
-            const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    // 掃描器 DOM 與狀態
+    const scannerModal = document.getElementById('scannerModal');
+    const btnCloseScanner = document.getElementById('btnCloseScanner');
+    const scanStatusText = document.getElementById('scanStatusText');
+    let html5QrCodeScanner = null;
+    let isStartingScanner = false;
 
-            // --- 意見回饋相關 State ---
-            const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
-            const [spinCount, setSpinCount] = useState(0);
-            const [hasPoppedUpFeedback, setHasPoppedUpFeedback] = useState(false);
-            const [feedbackRating, setFeedbackRating] = useState(0);
-            const [feedbackText, setFeedbackText] = useState("");
-            const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+    // 顯示狀態提示訊息
+    function showMessage(type, text) {
+      statusMessage.classList.remove('d-none');
+      if (type === 'success') {
+        statusMessage.className = 'mb-4 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 flex items-center gap-3';
+        statusMessage.innerHTML = `<div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div><span class="font-medium">${text}</span>`;
+      } else {
+        statusMessage.className = 'mb-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center gap-3';
+        statusMessage.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 text-red-500 shrink-0"></i><span class="font-medium">${text}</span>`;
+        lucide.createIcons();
+      }
+      
+      setTimeout(() => {
+        statusMessage.classList.add('d-none');
+      }, 8000);
+    }
 
-            useEffect(() => {
-                if (!GOOGLE_SHEET_CSV_URL) {
-                    setDbFatalError(true);
-                    setIsDbLoading(false);
-                    return;
-                }
+    // 更新畫面
+    function updateUI() {
+      itemCount.innerText = `共 ${modelCodes.length} 件商品`;
+      finalTextarea.value = modelCodes.join(' ');
 
-                const fetchDatabase = new Promise((resolve, reject) => {
-                    Papa.parse(GOOGLE_SHEET_CSV_URL, {
-                        download: true,
-                        header: true,
-                        complete: (results) => {
-                            try {
-                                const parsedData = { hat: [], top: [], bottom: [], shoes: [], accessory: [] };
-                                let fetchedDate = ''; 
-                                
-                                results.data.forEach(row => {
-                                    if (!fetchedDate && row.date && row.date.trim() !== '') fetchedDate = row.date.trim();
-
-                                    const cat = row.category?.trim().toLowerCase();
-                                    if (row.id && cat && parsedData[cat]) {
-                                        const n = row.name?.trim() || "未命名商品";
-                                        let itemGender = '中性';
-                                        if (row.gender && row.gender.trim() !== '') itemGender = row.gender.trim();
-                                        let itemLabels = row.label && row.label.trim() !== '' ? row.label.trim() : '';
-
-                                        parsedData[cat].push({
-                                            id: row.id.trim(),
-                                            name: n,
-                                            price: parseInt(row.price, 10) || 0,
-                                            img: `https://product-picture.decathlon.cn/model/${row.id.trim()}.jpg?f=1000`,
-                                            label: itemLabels,
-                                            gender: itemGender
-                                        });
-                                    }
-                                });
-
-                                categoryOrder.forEach(cat => {
-                                    if (parsedData[cat].length === 0) throw new Error(`分類 '${cat}' 缺少商品`);
-                                });
-
-                                setDbData(parsedData);
-                                setUpdateDate(fetchedDate || new Date().toLocaleDateString('zh-TW'));
-                                resolve();
-                            } catch (err) {
-                                reject(err);
-                            }
-                        },
-                        error: (err) => reject(err)
-                    });
-                });
-
-                const fetchLookbook = new Promise((resolve, reject) => {
-                    if (!LOOKBOOK_CSV_URL) { reject(new Error("未提供雜誌網址")); return; }
-                    Papa.parse(LOOKBOOK_CSV_URL, {
-                        download: true,
-                        header: true,
-                        complete: (results) => {
-                            try {
-                                const parsedLookbook = [];
-                                results.data.forEach((row, index) => {
-                                    if (row.title && row.title.trim() !== '') {
-                                        parsedLookbook.push({
-                                            id: index + 1,
-                                            title: row.title.trim(),
-                                            desc: row.description ? row.description.trim() : "",
-                                            coverImg: row.cover_image && row.cover_image.trim() !== '' ? row.cover_image.trim() : "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop",
-                                            productIds: row.product_ids ? row.product_ids.split(/[,、]/).map(id => id.trim()).filter(id => id) : []
-                                        });
-                                    }
-                                });
-
-                                if (parsedLookbook.length > 0) {
-                                    setLookbookData(parsedLookbook);
-                                    resolve();
-                                } else {
-                                    reject(new Error("雜誌資料庫無有效資料"));
-                                }
-                            } catch (err) { reject(err); }
-                        },
-                        error: (err) => reject(err)
-                    });
-                });
-
-                Promise.all([fetchDatabase, fetchLookbook])
-                    .then(() => setIsDbLoading(false))
-                    .catch(err => {
-                        console.error("載入發生致命錯誤：", err);
-                        setDbFatalError(true);
-                        setIsDbLoading(false);
-                    });
-
-            }, []);
-
-            const showMsg = (m) => { setToast(m); setTimeout(() => setToast(""), 3000); };
-
-            // --- 提交意見回饋至 Google Forms ---
-            const handleSubmitFeedback = async (e) => {
-                e.preventDefault();
-                if (!feedbackRating) return showMsg("請先選擇一個評分喔！");
-
-                setIsSubmittingFeedback(true);
-
-                // ⚠️ 請替換為您自己的 Google 表單資訊
-                const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSegsnsHKiBG2t4i-jzHyb2_TPlQzwBqUv3PxnITNWEuA_gsXw/formResponse";
-                const ENTRY_RATING = "entry.943868622"; // 替換為「評分」欄位的 ID
-                const ENTRY_TEXT = "entry.1211881642"; // 替換為「建議文字」欄位的 ID
-
-                const formData = new FormData();
-                formData.append(ENTRY_RATING, feedbackRating);
-                formData.append(ENTRY_TEXT, feedbackText);
-
-                try {
-                    // 使用 no-cors 模式背景送出，避免跨網域問題
-                    await fetch(GOOGLE_FORM_URL, { method: 'POST', mode: 'no-cors', body: formData });
-                    showMsg("收到！感謝您的回饋 ❤️");
-                    setIsFeedbackModalOpen(false);
-                    setFeedbackRating(0);
-                    setFeedbackText("");
-                } catch (error) {
-                    showMsg("感謝您的回饋 ❤️ (已紀錄)");
-                    setIsFeedbackModalOpen(false);
-                } finally {
-                    setIsSubmittingFeedback(false);
-                }
-            };
-
-            // 💡 包含邏輯：預設全選，點選後排除（加入已自備/無需推薦）
-            const toggleGenericPreset = (cat) => {
-                const genericId = `own-${cat}`;
-                const existingIdx = presetItems.findIndex(i => i.category === cat && i.id === genericId);
-                
-                if (existingIdx >= 0) {
-                    setPresetItems(presetItems.filter(i => i.id !== genericId));
-                    showMsg(`已將 ${categoryLabels[cat]} 加入推薦清單`);
-                } else {
-                    const newPresets = presetItems.filter(i => i.category !== cat);
-                    newPresets.push({
-                        category: cat,
-                        id: genericId,
-                        name: "🙋‍♂️ 已自備 / 無需推薦",
-                        type: 'owned',
-                        realPrice: 0
-                    });
-                    setPresetItems(newPresets);
-                    showMsg(`已排除 ${categoryLabels[cat]}`);
-                }
-            };
-
-            const handleRemovePreset = (id) => setPresetItems(presetItems.filter(i => i.id !== id));
-
-            const generateFilteredDb = useCallback((currentScenario, genderCondition, currentPresetItems = presetItems) => {
-                if (!dbData) return null;
-                const scenarioKeywords = {
-                    trekking: ['健行'], baiyue: ['百岳'], hiking: ['徒步'],
-                    island: ['環島'], winter: ['冬季']
-                };
-
-                let newDb = {};
-                categoryOrder.forEach(cat => {
-                    let items = dbData[cat].filter(i => {
-                        let sMatch = false;
-                        if (currentScenario === 'all') sMatch = true;
-                        else {
-                            const lblText = (i.label || '').toLowerCase();
-                            const keywords = scenarioKeywords[currentScenario] || [];
-                            sMatch = keywords.some(kw => lblText.includes(kw));
-                        }
-
-                        let gMatch = false;
-                        const gText = (i.gender || '');
-                        if (Array.isArray(genderCondition)) {
-                            if (genderCondition.length === 3) gMatch = true;
-                            else {
-                                if (genderCondition.includes('kids') && (gText.includes('兒童') || gText.includes('童'))) gMatch = true;
-                                if (genderCondition.includes('men') && (gText.includes('男') || gText.includes('中性'))) gMatch = true;
-                                if (genderCondition.includes('women') && (gText.includes('女') || gText.includes('中性'))) gMatch = true;
-                            }
-                        } else {
-                            if (genderCondition === 'all') gMatch = true;
-                            else if (genderCondition === 'kids' && (gText.includes('兒童') || gText.includes('童'))) gMatch = true;
-                            else if (genderCondition === 'men' && (gText.includes('男') || gText.includes('中性'))) gMatch = true;
-                            else if (genderCondition === 'women' && (gText.includes('女') || gText.includes('中性'))) gMatch = true;
-                        }
-                        return sMatch && gMatch;
-                    });
-
-                    if (items.length === 0) {
-                        items = dbData[cat].filter(i => {
-                            let gMatch = false;
-                            const gText = (i.gender || '');
-                            if (Array.isArray(genderCondition)) {
-                                if (genderCondition.length === 3) gMatch = true;
-                                else {
-                                    if (genderCondition.includes('kids') && (gText.includes('兒童') || gText.includes('童'))) gMatch = true;
-                                    if (genderCondition.includes('men') && (gText.includes('男') || gText.includes('中性'))) gMatch = true;
-                                    if (genderCondition.includes('women') && (gText.includes('女') || gText.includes('中性'))) gMatch = true;
-                                }
-                            } else {
-                                if (genderCondition === 'all') gMatch = true;
-                                else if (genderCondition === 'kids' && (gText.includes('兒童') || gText.includes('童'))) gMatch = true;
-                                else if (genderCondition === 'men' && (gText.includes('男') || gText.includes('中性'))) gMatch = true;
-                                else if (genderCondition === 'women' && (gText.includes('女') || gText.includes('中性'))) gMatch = true;
-                            }
-                            return gMatch;
-                        });
-                    }
-                    if (items.length === 0) items = dbData[cat]; 
-                    newDb[cat] = items;
-                });
-
-                currentPresetItems.forEach(preset => {
-                    const customItem = {
-                        id: preset.id, name: preset.name, price: preset.type === 'owned' ? 0 : preset.realPrice, 
-                        isOwned: preset.type === 'owned', isCart: preset.type === 'cart',
-                        img: preset.id.startsWith('own-') 
-                            ? `https://placehold.co/400x400/eeeeee/999999?text=${encodeURIComponent('無需推薦')}`
-                            : `https://product-picture.decathlon.cn/model/${preset.id}.jpg?f=1000`
-                    };
-                    newDb[preset.category] = [customItem, ...newDb[preset.category].filter(i => i.id !== preset.id)];
-                });
-                return newDb;
-            }, [dbData, presetItems]);
-
-            const goToSlot = () => {
-                if (!dbData) return;
-                const newDb = generateFilteredDb(scenario, targetGender); 
-
-                let initialSelections = { hat: 0, top: 0, bottom: 0, shoes: 0, accessory: 0 };
-                let initialLocked = { hat: false, top: false, bottom: false, shoes: false, accessory: false };
-
-                presetItems.forEach(preset => {
-                    initialSelections[preset.category] = 0; 
-                    initialLocked[preset.category] = true;  
-                });
-
-                setFilteredDb(newDb);
-                setSelections(initialSelections);
-                setLocked(initialLocked);
-                setIsOverBudget(false);
-                setView('slot');
-            };
-
-            const addCatalogItemToSlot = (item, cat, type) => {
-                const newPresets = presetItems.filter(i => i.category !== cat);
-                newPresets.push({
-                    category: cat,
-                    id: item.id,
-                    name: item.name,
-                    type: type,
-                    realPrice: item.price
-                });
-                
-                setPresetItems(newPresets);
-                
-                const newDb = generateFilteredDb(scenario, targetGender, newPresets);
-                setFilteredDb(newDb);
-                
-                setLocked(prev => ({ ...prev, [cat]: true }));
-                setSelections(prev => ({ ...prev, [cat]: 0 }));
-                
-                setView('slot');
-            };
-
-            const currentTotal = (filteredDb && view === 'slot') ? categoryOrder.reduce((sum, cat) => {
-                const item = filteredDb[cat][selections[cat]];
-                return sum + (item ? item.price : 0);
-            }, 0) : 0;
-
-            useEffect(() => { setIsOverBudget(currentTotal > budget); }, [currentTotal, budget]);
-
-            const isAnySpinning = Object.values(spinningStates).some(s => s);
-
-            const handleSpinAll = () => {
-                if (isAnySpinning || !filteredDb) return;
-
-                // --- 彩蛋：點擊5次隨機搭配後，自動跳出回饋視窗 ---
-                setSpinCount(prev => {
-                    const newCount = prev + 1;
-                    if (newCount === 5 && !hasPoppedUpFeedback) {
-                        setTimeout(() => {
-                            setIsFeedbackModalOpen(true);
-                            setHasPoppedUpFeedback(true);
-                        }, 1800); // 確保在轉輪動畫結束後才彈出
-                    }
-                    return newCount;
-                });
-
-                let lockedCost = 0;
-                categoryOrder.forEach(cat => {
-                    if (locked[cat] && filteredDb[cat][selections[cat]]) lockedCost += filteredDb[cat][selections[cat]].price;
-                });
-                
-                let availableBudget = budget - lockedCost;
-                let unlockedCats = categoryOrder.filter(cat => !locked[cat]);
-                if (unlockedCats.length === 0) return;
-
-                let bestCombo = { ...selections };
-                let foundCombo = false;
-
-                for (let i = 0; i < 150; i++) {
-                    let tempCost = 0;
-                    let tempCombo = {};
-                    unlockedCats.forEach(cat => {
-                        let items = filteredDb[cat];
-                        let randIdx = Math.floor(Math.random() * items.length);
-                        tempCombo[cat] = randIdx;
-                        tempCost += items[randIdx].price;
-                    });
-                    if (tempCost <= availableBudget) {
-                        bestCombo = { ...bestCombo, ...tempCombo };
-                        foundCombo = true; break;
-                    }
-                }
-
-                if (!foundCombo) {
-                    unlockedCats.forEach(cat => {
-                        let items = filteredDb[cat];
-                        let minPrice = Math.min(...items.map(it => it.price));
-                        let minIdx = items.findIndex(it => it.price === minPrice);
-                        bestCombo[cat] = minIdx;
-                    });
-                    showMsg("預算極限！已為您配對最便宜的組合。");
-                }
-
-                const newSpinning = { ...spinningStates };
-                unlockedCats.forEach(cat => newSpinning[cat] = true);
-                setSpinningStates(newSpinning);
-
-                categoryOrder.forEach((cat, index) => {
-                    if (!locked[cat]) {
-                        const interval = setInterval(() => {
-                            setSelections(prev => ({ ...prev, [cat]: Math.floor(Math.random() * filteredDb[cat].length) }));
-                        }, 80);
-                        setTimeout(() => {
-                            clearInterval(interval);
-                            setSelections(prev => ({ ...prev, [cat]: bestCombo[cat] }));
-                            setSpinningStates(prev => ({ ...prev, [cat]: false }));
-                        }, 800 + (index * 200));
-                    }
-                });
-            };
-
-            const catalogItems = useMemo(() => {
-                if (!dbData) return null;
-                return generateFilteredDb(catalogScenario, catalogGenders, []); 
-            }, [dbData, catalogScenario, catalogGenders, generateFilteredDb]);
-
-            const getProductInfo = useCallback((id) => {
-                if (!dbData) return null;
-                return Object.values(dbData).flat().find(item => item.id === id);
-            }, [dbData]);
-
-            // --- 重用的小組件：意見回饋按鈕 ---
-            // 💡 統一尺寸為 30x30
-            const FeedbackHeaderBtn = () => (
-                <button onClick={() => setIsFeedbackModalOpen(true)} className="p-1.5 w-[30px] h-[30px] flex items-center justify-center -mr-1 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors focus:outline-none" title="給點建議">
-                    <MessageIcon />
+      if (modelCodes.length > 0) {
+        emptyState.classList.add('d-none');
+        previewContainer.classList.remove('d-none');
+        previewContainer.innerHTML = '';
+        
+        modelCodes.forEach(code => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'relative group shrink-0';
+          itemDiv.innerHTML = `
+            <div class="w-36 h-36 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
+              <img 
+                src="https://product-picture.decathlon.cn/model/${code}.jpg?f=500"
+                alt="Model ${code}"
+                onerror="this.src='https://via.placeholder.com/150x150.png?text=No+Image'"
+                class="w-full h-full object-cover p-2"
+              />
+              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                <button
+                  type="button"
+                  onclick="handleDelete('${code}')"
+                  class="bg-red-500 text-white p-2.5 rounded-full hover:bg-red-600 transform hover:scale-110 transition-all shadow-lg"
+                  title="移除此商品"
+                >
+                  <i data-lucide="trash-2" class="w-5 h-5"></i>
                 </button>
-            );
+              </div>
+            </div>
+            <div class="text-center mt-3 text-sm font-bold text-gray-700">
+              ${code}
+            </div>
+          `;
+          previewContainer.appendChild(itemDiv);
+        });
+        lucide.createIcons();
+      } else {
+        emptyState.classList.remove('d-none');
+        previewContainer.classList.add('d-none');
+      }
+      checkSubmitButtonState();
+    }
 
-            // --- 底部 App 導覽列組件 ---
-            const BottomNav = () => (
-                <div className="bg-white border-t border-gray-200 flex justify-around items-center h-[48px] shadow-[0_-5px_15px_rgba(0,0,0,0.05)] flex-shrink-0 z-50">
-                    <button onClick={() => setView('magazine')} className={`flex-1 h-full flex flex-col items-center justify-center transition-colors ${view === 'magazine' ? 'text-blue-600' : 'text-gray-400 hover:text-blue-400'} focus:outline-none`}>
-                        <div className="transform scale-90"><BookOpenIcon /></div> 
-                        <span className="text-[9px] mt-0.5 font-bold">靈感誌</span>
-                    </button>
-                    <button onClick={() => {
-                        const isAnyLocked = Object.values(locked).some(v => v);
-                        if ((isAnyLocked || filteredDb) && view !== 'setup') {
-                            setView('slot');
-                        } else {
-                            setView('setup');
-                        }
-                    }} className={`flex-1 h-full flex flex-col items-center justify-center transition-colors ${view === 'setup' || view === 'slot' ? 'text-blue-600' : 'text-gray-400 hover:text-blue-400'} focus:outline-none`}>
-                        <div className="transform scale-90"><DicesIcon /></div> 
-                        <span className="text-[9px] mt-0.5 font-bold">拉霸機</span>
-                    </button>
-                    <button onClick={() => setView('catalog')} className={`flex-1 h-full flex flex-col items-center justify-center transition-colors ${view === 'catalog' ? 'text-blue-600' : 'text-gray-400 hover:text-blue-400'} focus:outline-none`}>
-                        <div className="transform scale-90"><GridIcon /></div> 
-                        <span className="text-[9px] mt-0.5 font-bold">總型錄</span>
-                    </button>
-                </div>
-            );
+    // 取得當前選擇的完整商區編號
+    function getSelectedLocation() {
+      const type = locTypeSelect.value;
+      if (type === 'TG') {
+        const dept = tgDeptSelect.value;
+        const num = tgNumSelect.value;
+        if (dept && num) return `${dept}-${num}`;
+      } else if (type === 'Box') {
+        const box = boxNumSelect.value;
+        if (box) return box;
+      }
+      return '';
+    }
 
-            if (dbFatalError) {
-                return (
-                    <div className="h-[100dvh] flex flex-col items-center justify-center bg-gray-50 p-6 text-center">
-                        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-5 shadow-sm"><XIcon /></div>
-                        <h2 className="text-xl font-black text-gray-800 mb-3 tracking-widest">無法讀取產品資料庫！</h2>
-                        <p className="text-sm font-bold text-gray-500 leading-relaxed">請洽詢商場服務人員，<br/>服務人員將為您提供協助！</p>
-                    </div>
-                );
+    // 檢查並切換送出按鈕的樣式與狀態
+    function checkSubmitButtonState() {
+      const isLocFilled = getSelectedLocation() !== '';
+      const hasModels = modelCodes.length > 0;
+      const isDisabled = isSubmitting || !hasModels || !isLocFilled;
+
+      submitBtn.disabled = isDisabled;
+
+      if (isDisabled) {
+        submitBtn.className = "w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all duration-200 bg-gray-200 text-gray-400 cursor-not-allowed";
+      } else {
+        submitBtn.className = "w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all duration-200 bg-[#3643ba] text-white hover:bg-blue-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5";
+      }
+    }
+
+    // ==========================================
+    // 📷 相機掃描器相關邏輯
+    // ==========================================
+    function openScannerModal() {
+      if (typeof Html5Qrcode === "undefined") {
+        showMessage('error', '相機模組仍在載入中，請稍後再試。');
+        return;
+      }
+      scanStatusText.innerText = "請將相機對準商品條碼或 QR Code";
+      scannerModal.classList.remove('d-none');
+      
+      // 稍微延遲以確保 Modal 中的 DOM 渲染完畢
+      setTimeout(startScanning, 150);
+    }
+
+    async function startScanning() {
+      try {
+        if (!html5QrCodeScanner) {
+          html5QrCodeScanner = new Html5Qrcode("qr-reader");
+        }
+        isStartingScanner = true;
+
+        await html5QrCodeScanner.start(
+          { facingMode: "environment" }, // 優先使用手機後置鏡頭
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          (decodedText) => {
+            // 使用 Regex 擷取網址裡的 6~8 碼數字 (Model Code)
+            const match = decodedText.match(/\d{6,8}/);
+            if (match) {
+              const modelCode = match[0];
+              if (!modelCodes.includes(modelCode)) {
+                modelCodes.push(modelCode);
+                updateUI();
+              }
+              scanStatusText.innerText = `成功加入貨號: ${modelCode}`;
+              // 抓到後自動關閉掃描視窗
+              stopAndCloseScanner();
+            } else {
+              // 掃描到東西但不是我們要的貨號格式
+              scanStatusText.innerText = `無法辨識貨號，目前掃描到: ${decodedText.substring(0, 15)}...`;
             }
+          },
+          (ignoreError) => {
+            // 忽略掃描過程中的背景錯誤
+          }
+        );
+        isStartingScanner = false;
+      } catch (err) {
+        console.error("相機啟動失敗", err);
+        isStartingScanner = false;
+        showMessage('error', '無法啟動相機！請確認已允許瀏覽器使用相機權限。');
+        scannerModal.classList.add('d-none');
+      }
+    }
 
-            if (isDbLoading) {
-                return (
-                    <div className="h-[100dvh] flex flex-col items-center justify-center bg-gray-50">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mb-4"></div>
-                        <p className="text-gray-500 text-sm font-bold tracking-widest animate-pulse">載入中...</p>
-                    </div>
-                );
-            }
+    async function stopAndCloseScanner() {
+      // 如果相機還在「啟動中」的狀態，延遲一下再關閉，避免 library 崩潰
+      if (isStartingScanner) {
+        setTimeout(stopAndCloseScanner, 300);
+        return;
+      }
 
-            // ================== 主要渲染區塊 ==================
+      if (html5QrCodeScanner) {
+        try {
+          await html5QrCodeScanner.stop();
+          html5QrCodeScanner.clear();
+        } catch (e) {
+          console.error("相機停止失敗", e);
+        }
+      }
+      scannerModal.classList.add('d-none');
+    }
 
-            const renderFeedbackModal = () => {
-                if (!isFeedbackModalOpen) return null;
-                return (
-                    <div className="absolute inset-0 z-[100] flex flex-col justify-end bg-black/60 backdrop-blur-[2px] transition-all overflow-hidden">
-                        <div className="w-full bg-white rounded-t-3xl p-5 shadow-2xl modal-enter max-h-[85vh] flex flex-col">
-                            <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-3 flex-shrink-0">
-                                <h3 className="text-sm font-black text-gray-800 flex items-center">
-                                    <MessageIcon /> <span className="ml-1.5">告訴我們您的想法</span>
-                                </h3>
-                                <button onClick={() => setIsFeedbackModalOpen(false)} className="p-1 text-gray-400 hover:text-red-500 transition-colors focus:outline-none"><XIcon /></button>
-                            </div>
-                            
-                            <div className="mb-5 flex flex-col items-center">
-                                {/* 💡 修改意見回饋文案 */}
-                                <p className="text-xs font-bold text-gray-500 mb-3 text-center">您喜歡這個互動平台嗎？</p>
-                                <div className="flex space-x-3">
-                                    {[{score:1, emoji:'😡'}, {score:2, emoji:'🙁'}, {score:3, emoji:'😐'}, {score:4, emoji:'🙂'}, {score:5, emoji:'😍'}].map(item => (
-                                        <button 
-                                            key={item.score} 
-                                            onClick={() => setFeedbackRating(item.score)} 
-                                            className={`text-3xl transition-transform transform active:scale-90 focus:outline-none ${feedbackRating === item.score ? 'scale-125 drop-shadow-md grayscale-0' : 'grayscale opacity-50 hover:grayscale-0 hover:opacity-100'}`}
-                                        >
-                                            {item.emoji}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            
-                            <div className="mb-6">
-                                <textarea 
-                                    value={feedbackText} 
-                                    onChange={(e) => setFeedbackText(e.target.value)} 
-                                    placeholder="(選填) 有什麼我們可以做得更好，或是找不到的裝備嗎？" 
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-none h-24"
-                                ></textarea>
-                            </div>
+    // 綁定掃描按鈕事件
+    btnScan.addEventListener('click', openScannerModal);
+    btnCloseScanner.addEventListener('click', stopAndCloseScanner);
 
-                            <button 
-                                onClick={handleSubmitFeedback} 
-                                disabled={isSubmittingFeedback || feedbackRating === 0} 
-                                className={`w-full py-4 text-white rounded-xl font-black text-sm tracking-widest uppercase transition-all shadow-lg flex-shrink-0 focus:outline-none ${isSubmittingFeedback || feedbackRating === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:scale-95'}`}
-                            >
-                                {isSubmittingFeedback ? '傳送中...' : '送出回饋'}
-                            </button>
-                        </div>
-                    </div>
-                );
-            };
+    // ==========================================
+    // 處理批量新增與手動輸入
+    // ==========================================
+    function handleAddModels() {
+      const val = bulkInput.value;
+      if (!val.trim()) return;
 
-            if (view === 'magazine') {
-                return (
-                    <div className="h-[100dvh] bg-gray-50 flex justify-center overflow-hidden relative">
-                        {renderFeedbackModal()}
-                        {toast && <div className="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 toast-enter bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-xl">{toast}</div>}
-                        <div className="w-full max-w-md bg-white h-full shadow-2xl relative flex flex-col">
-                            <div className="bg-white px-4 py-3 shadow-sm z-20 flex-shrink-0 flex justify-between items-center border-b border-gray-200">
-                                {/* 💡 統一左側佔位寬度為 30px */}
-                                <div className="w-[30px]"></div>
-                                <div className="text-center w-full px-2">
-                                    <h1 className="text-sm font-black text-gray-800 tracking-widest uppercase">凹逗穿搭靈感誌</h1>
-                                    <p className="text-[10px] text-blue-600 font-bold mt-0.5 tracking-widest">OUTDOOR LOOKBOOK</p>
-                                </div>
-                                <FeedbackHeaderBtn />
-                            </div>
+      const cleanedInput = val.replace(/[,，。;；\n]/g, ' ');
+      const newCodes = cleanedInput.split(/\s+/).filter(code => code.trim() !== '');
 
-                            <div className="flex-1 overflow-y-auto no-scrollbar pb-6">
-                                {lookbookData.length > 0 ? lookbookData.map(look => (
-                                    <div key={look.id} className="mb-8 bg-white border-b border-gray-100 pb-8">
-                                        <div className="w-full aspect-[1/1.414] bg-gray-100 relative overflow-hidden">
-                                            <img src={look.coverImg} alt={look.title} className="w-full h-full object-cover" />
-                                            <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/60 to-transparent p-5 pt-6">
-                                                <h2 className="text-2xl font-black text-white tracking-wide drop-shadow-lg">{look.title}</h2>
-                                            </div>
-                                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-5">
-                                                <p className="text-sm text-white font-medium leading-relaxed drop-shadow-md">{look.desc}</p>
-                                            </div>
-                                        </div>
+      const uniqueInputCodes = [...new Set(newCodes)];
+      const finalCodesToAdd = uniqueInputCodes.filter(code => !modelCodes.includes(code));
+      
+      if (finalCodesToAdd.length > 0) {
+        modelCodes = [...modelCodes, ...finalCodesToAdd];
+        updateUI();
+      }
+      
+      bulkInput.value = '';
+    }
 
-                                        <div className="mt-5 pl-4">
-                                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">此穿搭包含以下商品：</h3>
-                                            <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-2 pr-4 snap-x">
-                                                {look.productIds.map(productId => {
-                                                    const itemInfo = getProductInfo(productId);
-                                                    if (!itemInfo) return null; 
-                                                    return (
-                                                        <div key={productId} className="flex-shrink-0 w-32 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col snap-start">
-                                                            <div className="w-full aspect-square bg-gray-50 relative flex items-center justify-center overflow-hidden">
-                                                                <img src={itemInfo.img} className="w-full h-[100%] object-contain mix-blend-multiply" onError={(e) => { e.target.src = 'https://placehold.co/400x400/eeeeee/999999?text=無圖片'; }} />
-                                                            </div>
-                                                            <div className="p-2.5 flex flex-col flex-1 border-t border-gray-50">
-                                                                <h4 className="text-[11px] font-bold text-gray-800 line-clamp-2 leading-snug mb-0.5">{itemInfo.name}</h4>
-                                                                <p className="text-[9px] text-gray-400 font-sans mb-1">{itemInfo.id}</p>
-                                                                <p className="text-[13px] font-black text-gray-900 font-price tracking-tighter mb-2">${(itemInfo.price || 0).toLocaleString()}</p>
-                                                                <a href={`https://www.decathlon.tw/${itemInfo.id}/1769`} target="_blank" rel="noopener noreferrer" className="mt-auto block text-center text-[10px] bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white py-1.5 rounded-md font-bold transition-colors focus:outline-none">
-                                                                    查看商品詳情
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )) : (
-                                    <div className="text-center py-20 text-gray-400 font-bold">
-                                        <div className="text-4xl mb-3">📭</div>目前沒有精選穿搭
-                                    </div>
-                                )}
+    // 全域刪除方法
+    window.handleDelete = function(codeToRemove) {
+      modelCodes = modelCodes.filter(code => code !== codeToRemove);
+      updateUI();
+    };
 
-                                <div className="px-6 pt-4 pb-8 text-center bg-gray-50 m-4 rounded-3xl border border-gray-200">
-                                    <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                                        <DicesIcon />
-                                    </div>
-                                    <h3 className="text-lg font-black text-gray-800 mb-2">還需要更多靈感嗎？</h3>
-                                    <p className="text-xs text-gray-500 mb-5 leading-relaxed font-medium">自己設定預算與行程，<br/>用拉霸機幫你搭配專屬的全身裝備！</p>
-                                    <button onClick={() => setView('setup')} className="w-full bg-blue-600 text-white font-black text-sm py-4 rounded-xl shadow-lg hover:bg-blue-700 active:scale-95 transition-all uppercase tracking-widest flex justify-center items-center focus:outline-none">
-                                        <span>試試看拉霸機</span>
-                                        <span className="ml-1"><ChevronRightIcon /></span>
-                                    </button>
-                                </div>
-                                
-                                <div className="mt-2 mb-6 text-[10px] text-gray-400 text-center leading-relaxed">
-                                    此頁推薦內容僅供參考，實際商品與價格以現場為準。<br/>最後更新日期：{updateDate}
-                                </div>
-                            </div>
+    // 事件監聽綁定
+    btnAdd.addEventListener('click', handleAddModels);
 
-                            <BottomNav />
-                        </div>
-                    </div>
-                );
-            }
+    bulkInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAddModels();
+      }
+    });
 
-            if (view === 'setup') {
-                return (
-                    <div className="h-[100dvh] bg-gray-50 flex justify-center overflow-hidden relative">
-                        {renderFeedbackModal()}
-                        {toast && <div className="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 toast-enter bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-xl">{toast}</div>}
+    locTypeSelect.addEventListener('change', function(e) {
+      const val = e.target.value;
+      tgSelects.classList.add('d-none');
+      boxSelects.classList.add('d-none');
+      
+      if (val === 'TG') tgSelects.classList.remove('d-none');
+      if (val === 'Box') boxSelects.classList.remove('d-none');
+      
+      checkSubmitButtonState();
+    });
 
-                        <div className="w-full max-w-md bg-white h-full shadow-2xl relative flex flex-col">
-                            
-                            <div className="bg-white px-4 py-3 shadow-sm z-20 flex-shrink-0 flex justify-between items-center border-b border-gray-200">
-                                {/* 💡 統一左側佔位寬度為 30px */}
-                                <div className="w-[30px]"></div>
-                                <div className="text-center w-full px-2">
-                                    <h1 className="text-sm font-black text-gray-800 tracking-widest uppercase">登山健行裝備拉霸機</h1>
-                                    <p className="text-[10px] text-blue-600 font-bold mt-0.5 tracking-widest">你的凹逗穿搭好幫手</p>
-                                </div>
-                                <FeedbackHeaderBtn />
-                            </div>
+    tgDeptSelect.addEventListener('change', function(e) {
+      const dept = e.target.value;
+      tgNumSelect.innerHTML = '<option value="">選擇編號</option>';
+      if (dept && locationConfig.TG[dept]) {
+        locationConfig.TG[dept].forEach(num => {
+          tgNumSelect.innerHTML += `<option value="${num}">${num}</option>`;
+        });
+      }
+      checkSubmitButtonState();
+    });
 
-                            <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-3 pb-6">
-                                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                    <h2 className="text-[11px] font-bold text-gray-800 mb-2 flex justify-between items-end">
-                                        <span className="flex items-center"><span className="w-1 h-2.5 bg-blue-600 rounded-full mr-1.5"></span>新購裝備預算</span>
-                                        <span className="text-blue-600 font-price font-black text-sm">${budget.toLocaleString()}</span>
-                                    </h2>
-                                    <input type="range" min="500" max="50000" step="100" value={budget} onChange={(e) => setBudget(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none" />
-                                    <div className="flex justify-between text-[9px] text-gray-400 mt-1.5 font-sans"><span>$500</span><span>$50,000</span></div>
-                                </div>
+    tgNumSelect.addEventListener('change', checkSubmitButtonState);
+    boxNumSelect.addEventListener('change', checkSubmitButtonState);
 
-                                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                    <h2 className="text-[11px] font-bold text-gray-800 mb-2 flex justify-between">
-                                        <span className="flex items-center"><span className="w-1 h-2.5 bg-blue-600 rounded-full mr-1.5"></span>適用對象</span>
-                                    </h2>
-                                    <div className="flex flex-wrap gap-1.5">
-                                        <ToggleBtn className="flex-1 min-w-[22%]" active={targetGender === 'all'} onClick={() => setTargetGender('all')}><span className="text-[12px]">🌍</span>&nbsp;不拘</ToggleBtn>
-                                        <ToggleBtn className="flex-1 min-w-[22%]" active={targetGender === 'men'} onClick={() => setTargetGender('men')}><span className="text-[12px]">👦</span>&nbsp;男款</ToggleBtn>
-                                        <ToggleBtn className="flex-1 min-w-[22%]" active={targetGender === 'women'} onClick={() => setTargetGender('women')}><span className="text-[12px]">👧</span>&nbsp;女款</ToggleBtn>
-                                        <ToggleBtn className="flex-1 min-w-[22%]" active={targetGender === 'kids'} onClick={() => setTargetGender('kids')}><span className="text-[12px]">👶</span>&nbsp;兒童</ToggleBtn>
-                                    </div>
-                                </div>
+    mainForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const finalLocation = getSelectedLocation();
+      if (!finalLocation) {
+        showMessage('error', '請完整選擇區域與編號！');
+        return;
+      }
 
-                                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                    <h2 className="text-[11px] font-bold text-gray-800 mb-2 flex items-center"><span className="w-1 h-2.5 bg-blue-600 rounded-full mr-1.5"></span>行程情境</h2>
-                                    <div className="flex flex-wrap gap-1.5">
-                                        <ToggleBtn className="flex-1 min-w-[28%]" active={scenario === 'all'} onClick={() => setScenario('all')}><span className="text-[12px]">🌍</span>&nbsp;通用</ToggleBtn>
-                                        <ToggleBtn className="flex-1 min-w-[28%]" active={scenario === 'trekking'} onClick={() => setScenario('trekking')}><span className="text-[12px]">🥾</span>&nbsp;健行</ToggleBtn>
-                                        <ToggleBtn className="flex-1 min-w-[28%]" active={scenario === 'baiyue'} onClick={() => setScenario('baiyue')}><span className="text-[12px]">⛰️</span>&nbsp;百岳</ToggleBtn>
-                                        <ToggleBtn className="flex-1 min-w-[28%]" active={scenario === 'hiking'} onClick={() => setScenario('hiking')}><span className="text-[12px]">🚶</span>&nbsp;徒步</ToggleBtn>
-                                        <ToggleBtn className="flex-1 min-w-[28%]" active={scenario === 'island'} onClick={() => setScenario('island')}><span className="text-[12px]">🧳</span>&nbsp;環島</ToggleBtn>
-                                        <ToggleBtn className="flex-1 min-w-[28%]" active={scenario === 'winter'} onClick={() => setScenario('winter')}><span className="text-[12px]">❄️</span>&nbsp;冬季</ToggleBtn>
-                                    </div>
-                                    
-                                    <div className="mt-3 bg-blue-50/70 border border-blue-100 rounded-xl p-3 shadow-inner">
-                                        <h3 className="text-[11px] font-bold text-blue-800 mb-1 flex items-center">
-                                            <span className="mr-1">💡</span> {scenarioTips[scenario].title}
-                                        </h3>
-                                        <p className="text-[10px] text-blue-700 leading-relaxed font-medium whitespace-pre-line">
-                                            {scenarioTips[scenario].text}
-                                        </p>
-                                    </div>
-                                </div>
+      isSubmitting = true;
+      checkSubmitButtonState();
+      submitBtnText.innerText = '處理中...';
 
-                                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                    <h2 className="text-[11px] font-bold text-gray-800 mb-1 flex items-center">
-                                        <span className="w-1 h-2.5 bg-blue-600 rounded-full mr-1.5"></span>你需要哪些裝備建議呢？
-                                    </h2>
-                                    <p className="text-[10px] text-gray-500 mb-3 leading-relaxed">
-                                        預設提供全套裝備建議。若您已自備或不需要某項裝備，請點擊取消勾選，系統配對時將自動跳過且不計入預算。
-                                    </p>
-                                    
-                                    <div className="flex flex-wrap gap-1.5 mb-3">
-                                        {categoryOrder.map(cat => {
-                                            const isNotNeeded = presetItems.some(i => i.category === cat && i.id === `own-${cat}`);
-                                            const isNeeded = !isNotNeeded;
-                                            return (
-                                                <button 
-                                                    key={cat} 
-                                                    onClick={() => toggleGenericPreset(cat)}
-                                                    className={`flex-1 min-w-[28%] py-2 rounded-xl text-[11px] font-bold border-2 transition-all focus:outline-none ${isNeeded ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-200 text-gray-400 bg-gray-50 hover:border-gray-300 opacity-70'}`}
-                                                >
-                                                    {isNeeded ? '✅ ' : ''}{categoryLabels[cat]}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
+      if (!GOOGLE_FORM_URL) {
+        setTimeout(() => {
+          isSubmitting = false;
+          checkSubmitButtonState();
+          submitBtnText.innerText = '確認無誤，送出資料';
+          showMessage('success', `【模擬測試】資料已準備送出！(區域: ${finalLocation})`);
+        }, 1000);
+        return;
+      }
 
-                                    <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
-                                        {presetItems.length === 0 ? (
-                                            <div className="text-center py-2 text-[9px] text-gray-400 border border-dashed border-gray-200 rounded-lg">
-                                                目前選擇由系統自動推薦全套裝備
-                                            </div>
-                                        ) : (
-                                            presetItems.map(item => (
-                                                <div key={item.id} className={`flex justify-between items-center border rounded-lg p-1.5 px-2 ${item.type === 'owned' ? 'bg-white border-gray-200' : 'bg-amber-50 border-amber-200'}`}>
-                                                    <div className="flex items-center space-x-1.5 overflow-hidden">
-                                                        <span className={`text-[8px] text-white px-1 py-0.5 rounded font-bold flex-shrink-0 ${item.type === 'owned' ? 'bg-gray-500' : 'bg-amber-500'}`}>{categoryLabels[item.category]}</span>
-                                                        <span className="text-[9px] font-bold text-gray-800 truncate leading-none">
-                                                            {item.name} {item.type === 'cart' ? `($${(item.realPrice || 0).toLocaleString()})` : ''}
-                                                        </span>
-                                                    </div>
-                                                    <button onClick={() => {
-                                                        if(item.id.startsWith('own-')) {
-                                                            toggleGenericPreset(item.category);
-                                                        } else {
-                                                            handleRemovePreset(item.id);
-                                                        }
-                                                    }} className="text-gray-400 hover:text-red-500 flex-shrink-0 transition-colors focus:outline-none"><XIcon /></button>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                </div>
-                                
-                                <div className="py-2 text-[10px] text-gray-400 text-center leading-relaxed">
-                                    此頁推薦內容僅供參考，實際商品與價格以現場為準。<br/>最後更新日期：{updateDate}
-                                </div>
-                            </div>
+      // --- 實際送出資料到 Google 表單 ---
+      const formData = new URLSearchParams();
+      formData.append(ENTRY_LOCATION, finalLocation);
+      formData.append(ENTRY_MODELS, modelCodes.join(' '));
 
-                            <div className="px-4 py-3 bg-white border-t border-gray-100 z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.02)]">
-                                <button onClick={goToSlot} className="w-full flex items-center justify-center space-x-1.5 py-3.5 rounded-xl text-xs font-black tracking-widest text-white shadow-md transition-all transform active:scale-95 uppercase bg-blue-600 focus:outline-none">
-                                    <span>完成設定，進入拉霸機</span>
-                                    <ChevronRightIcon />
-                                </button>
-                            </div>
+      fetch(GOOGLE_FORM_URL, {
+        method: 'POST',
+        mode: 'no-cors', 
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
+      }).then(() => {
+        isSubmitting = false;
+        checkSubmitButtonState();
+        submitBtnText.innerText = '確認無誤，送出資料';
+        
+        modelCodes = [];
+        updateUI();
+        
+        showMessage('success', '資料已成功送出至系統！');
+      }).catch((error) => {
+        isSubmitting = false;
+        checkSubmitButtonState();
+        submitBtnText.innerText = '確認無誤，送出資料';
+        
+        showMessage('error', '傳送失敗，請檢查網路連線或表單設定。');
+        console.error("Form Submit Error:", error);
+      });
+    });
 
-                            <BottomNav />
-                        </div>
-                    </div>
-                );
-            }
+    // --- 初始化選單與讀取 Google Sheet ---
+    function initDropdowns() {
+      tgDeptSelect.innerHTML = '<option value="">選擇部門</option>';
+      Object.keys(locationConfig.TG).forEach(dept => {
+        tgDeptSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
+      });
 
-            if (view === 'catalog') {
-                const visibleCategories = catalogActiveTab === 'all' ? categoryOrder : [catalogActiveTab];
+      boxNumSelect.innerHTML = '<option value="">選擇 Box 編號</option>';
+      locationConfig.Box.forEach(box => {
+        boxNumSelect.innerHTML += `<option value="${box}">${box}</option>`;
+      });
+    }
 
-                return (
-                    <div className="h-[100dvh] bg-gray-50 flex justify-center overflow-hidden relative">
-                        {renderFeedbackModal()}
-                        {toast && <div className="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 toast-enter bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-xl">{toast}</div>}
-                        
-                        <div className="w-full max-w-md bg-gray-50 h-full shadow-2xl relative flex flex-col overflow-hidden">
-                            
-                            {/* 彈出式篩選視窗 Modal */}
-                            {isFilterModalOpen && (
-                                <div className="absolute inset-0 z-[100] flex flex-col justify-end bg-black/60 backdrop-blur-[2px] transition-all overflow-hidden">
-                                    <div className="w-full bg-white rounded-t-3xl p-5 shadow-2xl modal-enter max-h-[85vh] flex flex-col">
-                                        <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-3 flex-shrink-0">
-                                            <h3 className="text-sm font-black text-gray-800 flex items-center">
-                                                <FilterIcon /> <span className="ml-1.5">進階篩選</span>
-                                            </h3>
-                                            <button onClick={() => setIsFilterModalOpen(false)} className="p-1 text-gray-400 hover:text-red-500 transition-colors focus:outline-none"><XIcon /></button>
-                                        </div>
-                                        
-                                        <div className="mb-6 overflow-y-auto no-scrollbar">
-                                            <div className="mb-5">
-                                                <label className="text-xs font-bold text-gray-500 mb-3 block">裝備對象（三格全亮即為全選）</label>
-                                                <div className="grid grid-cols-3 gap-2">
-                                                    <button onClick={() => {
-                                                        setCatalogGenders(prev => prev.includes('men') ? (prev.length > 1 ? prev.filter(x => x !== 'men') : prev) : [...prev, 'men']);
-                                                    }} className={`py-3 rounded-xl text-xs font-bold border-2 transition-all focus:outline-none ${catalogGenders.includes('men') ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>👦 男款</button>
-                                                    <button onClick={() => {
-                                                        setCatalogGenders(prev => prev.includes('women') ? (prev.length > 1 ? prev.filter(x => x !== 'women') : prev) : [...prev, 'women']);
-                                                    }} className={`py-3 rounded-xl text-xs font-bold border-2 transition-all focus:outline-none ${catalogGenders.includes('women') ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>👧 女款</button>
-                                                    <button onClick={() => {
-                                                        setCatalogGenders(prev => prev.includes('kids') ? (prev.length > 1 ? prev.filter(x => x !== 'kids') : prev) : [...prev, 'kids']);
-                                                    }} className={`py-3 rounded-xl text-xs font-bold border-2 transition-all focus:outline-none ${catalogGenders.includes('kids') ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>👶 兒童</button>
-                                                </div>
-                                            </div>
+    async function loadConfig() {
+      if (!GOOGLE_SHEET_CSV_URL) {
+        initDropdowns();
+        return;
+      }
+      
+      dataSourceStatus.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>正在同步後台資料...`;
+      dataSourceStatus.className = "text-xs mt-3 flex items-center gap-1 text-blue-500 font-bold";
+      lucide.createIcons();
+      
+      try {
+        let fetchUrl = GOOGLE_SHEET_CSV_URL;
+        if (fetchUrl.includes('/pubhtml')) {
+            fetchUrl = fetchUrl.replace('/pubhtml', '/pub');
+            fetchUrl += fetchUrl.includes('?') ? '&output=csv' : '?output=csv';
+        }
 
-                                            <div>
-                                                <label className="text-xs font-bold text-gray-500 mb-3 block">行程情境</label>
-                                                <div className="grid grid-cols-3 gap-2">
-                                                    {Object.keys(scenarioTips).map(s => (
-                                                        <button key={s} onClick={() => setCatalogScenario(s)} className={`py-3 rounded-xl text-xs font-bold border-2 transition-all flex items-center justify-center space-x-1 focus:outline-none ${catalogScenario === s ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
-                                                            <span>{scenarioTips[s].title.split(' ')[0]}</span>
-                                                            <span>{scenarioTips[s].title.split(' ')[1].split('【')[0]}</span>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
+        let csvText = '';
 
-                                        <button onClick={() => setIsFilterModalOpen(false)} className="w-full py-4 bg-blue-600 text-white rounded-xl font-black text-sm tracking-widest uppercase hover:bg-blue-700 active:scale-95 transition-all shadow-lg flex-shrink-0 focus:outline-none">
-                                            套用篩選條件
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+        try {
+            const res = await fetch(fetchUrl);
+            if (!res.ok) throw new Error("CORS or Server Error");
+            csvText = await res.text();
+        } catch (directError) {
+            console.warn("直接讀取被阻擋，嘗試使用 Proxy 代理伺服器...", directError);
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fetchUrl)}`;
+            const proxyRes = await fetch(proxyUrl);
+            if (!proxyRes.ok) throw new Error("Proxy Fetch Failed");
+            csvText = await proxyRes.text();
+        }
+        
+        if (csvText.trim().toLowerCase().startsWith('<!doctype html>')) {
+            throw new Error("AUTH_ERROR");
+        }
 
-                            {/* Header */}
-                            <div className="bg-white shadow-sm z-20 flex-shrink-0 border-b border-gray-200">
-                                <div className="px-4 py-3 flex justify-between items-center">
-                                    {/* 💡 統一左側按鈕尺寸 */}
-                                    <button onClick={() => setIsFilterModalOpen(true)} className="p-1.5 w-[30px] h-[30px] flex items-center justify-center -ml-1 rounded-full text-gray-500 bg-gray-100 hover:bg-blue-100 hover:text-blue-600 transition-colors focus:outline-none" title="進階篩選">
-                                        <FilterIcon />
-                                    </button>
-                                    <div className="text-center w-full px-2">
-                                        {/* 💡 修改型錄標題 */}
-                                        <h1 className="text-sm font-black text-gray-800 tracking-widest uppercase">登山健行裝備型錄</h1>
-                                        <p className="text-[10px] text-blue-600 font-bold mt-0.5 tracking-widest">
-                                            {catalogScenario === 'all' ? '通用' : scenarioTips[catalogScenario].title.split(' ')[1].split('【')[0]} | {catalogGenders.length === 3 ? '全部對象' : catalogGenders.map(g => g === 'men' ? '男' : g === 'women' ? '女' : '兒童').sort((a,b) => {
-                                                const order = {'men': 0, 'women': 1, 'kids': 2};
-                                                return order[a] - order[b];
-                                            }).join('/')}
-                                        </p>
-                                    </div>
-                                    <FeedbackHeaderBtn />
-                                </div>
+        const rows = csvText.split('\n').map(row => row.trim().split(','));
+        const newConfig = { TG: {}, Box: [] };
+        
+        for (let i = 1; i < rows.length; i++) {
+          if (!rows[i] || rows[i].length < 1) continue;
+          
+          const type = rows[i][0] ? rows[i][0].replace(/['"]/g, '') : '';
+          const dept = rows[i][1] ? rows[i][1].replace(/['"]/g, '') : '';
+          const num = rows[i][2] ? rows[i][2].replace(/['"]/g, '') : '';
+          
+          if (!type) continue;
+          
+          if (type.toUpperCase() === 'TG' && dept && num) {
+            if (!newConfig.TG[dept]) newConfig.TG[dept] = [];
+            newConfig.TG[dept].push(num);
+          } else if (type.toUpperCase() === 'BOX' && num) {
+            newConfig.Box.push(num);
+          }
+        }
+        
+        if (Object.keys(newConfig.TG).length > 0 || newConfig.Box.length > 0) {
+            locationConfig = newConfig;
+            dataSourceStatus.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i>已成功載入最新編號清單`;
+            dataSourceStatus.className = "text-xs mt-3 flex items-center gap-1 text-green-600 font-bold";
+        } else {
+            throw new Error("FORMAT_ERROR");
+        }
+      } catch (err) {
+        console.warn("載入失敗:", err.message);
+        
+        if (err.message === "AUTH_ERROR") {
+          dataSourceStatus.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i>讀取失敗：權限非公開，已切換預設資料`;
+        } else {
+          dataSourceStatus.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4"></i>網路異常或網址錯誤，已切換回預設資料`;
+        }
+        
+        dataSourceStatus.className = "text-xs mt-3 flex items-center gap-1 text-red-500 font-bold";
+      }
+      
+      lucide.createIcons();
+      initDropdowns();
+    }
 
-                                {/* 分類標籤 */}
-                                <div className="flex overflow-x-auto no-scrollbar px-3 pt-1 pb-3 space-x-2">
-                                    <button onClick={() => setCatalogActiveTab('all')} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border focus:outline-none ${catalogActiveTab === 'all' ? 'bg-gray-800 text-white border-gray-800 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
-                                        全部裝備
-                                    </button>
-                                    {categoryOrder.map(cat => (
-                                        <button key={`tab-${cat}`} onClick={() => setCatalogActiveTab(cat)} className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border focus:outline-none ${catalogActiveTab === cat ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
-                                            {categoryLabels[cat]} <span className="opacity-80 ml-0.5 font-sans text-[9px]">({catalogItems ? catalogItems[cat].length : 0})</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* 總覽內容 */}
-                            <div className="flex-1 overflow-y-auto no-scrollbar p-3 space-y-4 pb-6">
-                                {visibleCategories.map(cat => (
-                                    <div key={cat} className="bg-white rounded-xl shadow-sm border border-gray-100 p-3">
-                                        <h3 className="text-[11px] font-bold text-gray-800 mb-3 border-b border-gray-100 pb-2 flex items-center"><span className="w-1.5 h-3 bg-blue-600 rounded-full mr-1.5"></span>{categoryLabels[cat]}</h3>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {catalogItems && catalogItems[cat].map((item) => {
-                                                const sessionIdx = filteredDb ? filteredDb[cat].findIndex(i => i.id === item.id) : -1;
-                                                return (
-                                                    <div key={item.id} className="flex flex-col border border-gray-100 rounded-xl overflow-hidden relative shadow-sm hover:border-blue-200 transition-colors">
-                                                        <div className="w-full aspect-square bg-gray-50 relative flex items-center justify-center overflow-hidden">
-                                                            <img src={item.img} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" onError={(e) => { e.target.src = 'https://placehold.co/400x400/eeeeee/999999?text=無圖片'; }} />
-                                                            {item.isOwned && <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">✅ 已擁有</div>}
-                                                            {item.isCart && <div className="absolute inset-0 bg-amber-900/30 flex items-center justify-center text-white text-[10px] font-bold backdrop-blur-[1px]">❤️ 待購清單</div>}
-                                                        </div>
-                                                        <div className="p-2.5 flex flex-col flex-1 bg-white">
-                                                            <h4 className="text-[11px] font-bold text-gray-800 line-clamp-2 leading-snug mb-0.5">{item.name}</h4>
-                                                            <p className="text-[9px] text-gray-400 font-sans mb-1">{item.id}</p>
-                                                            <p className="text-[13px] font-black text-gray-800 font-price mb-2">${(item.price || 0).toLocaleString()}</p>
-                                                            
-                                                            <div className="mt-auto grid grid-cols-2 gap-1.5">
-                                                                <button 
-                                                                    onClick={() => addCatalogItemToSlot(item, cat, 'owned')}
-                                                                    className="w-full py-1.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-[10px] font-bold rounded-lg transition-colors flex justify-center items-center focus:outline-none shadow-sm"
-                                                                >
-                                                                    ✅ 已擁有
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => addCatalogItemToSlot(item, cat, 'cart')}
-                                                                    className="w-full py-1.5 bg-blue-600 text-white hover:bg-blue-700 text-[10px] font-bold rounded-lg transition-colors flex justify-center items-center focus:outline-none shadow-sm"
-                                                                >
-                                                                    ❤️ 加入待購
-                                                                </button>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                ))}
-
-                                <div className="pt-4 pb-6 text-[10px] text-gray-400 text-center leading-relaxed">
-                                    此頁推薦內容僅供參考，實際商品與價格以現場為準。<br/>最後更新日期：{updateDate}
-                                </div>
-                            </div>
-
-                            <BottomNav />
-                        </div>
-                    </div>
-                );
-            }
-
-            // --- 視圖 2：滿版動態拉霸機 ---
-            const ownedCount = presetItems.filter(i => i.type === 'owned').length;
-
-            return (
-                <div className="h-[100dvh] bg-gray-50 flex justify-center overflow-hidden relative">
-                    {renderFeedbackModal()}
-                    {toast && <div className="fixed top-14 left-1/2 transform -translate-x-1/2 z-50 toast-enter bg-gray-900 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-xl">{toast}</div>}
-                    
-                    <div className="w-full max-w-md bg-gray-50 h-full shadow-2xl relative flex flex-col">
-                        
-                        {/* 頂部 Header */}
-                        <div className="bg-white px-4 py-3 shadow-sm z-20 flex-shrink-0 flex justify-between items-center border-b border-gray-200">
-                            {/* 💡 統一左側返回鍵尺寸 */}
-                            <button onClick={() => {
-                                const syncedPresets = [];
-                                categoryOrder.forEach(cat => {
-                                    if (locked[cat] && filteredDb && filteredDb[cat]) {
-                                        const item = filteredDb[cat][selections[cat]];
-                                        if (item) {
-                                            const existingPreset = presetItems.find(p => p.id === item.id);
-                                            syncedPresets.push({
-                                                category: cat,
-                                                id: item.id,
-                                                name: item.name,
-                                                type: item.isOwned ? 'owned' : (item.isCart ? 'cart' : 'cart'), 
-                                                realPrice: existingPreset ? existingPreset.realPrice : item.price
-                                            });
-                                        }
-                                    }
-                                });
-                                setPresetItems(syncedPresets);
-                                setView('setup');
-                            }} className="p-1.5 w-[30px] h-[30px] flex items-center justify-center -ml-1 rounded-full text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors focus:outline-none" title="回到設定">
-                                <ArrowLeftIcon />
-                            </button>
-                            <div className="text-center w-full px-2">
-                                <h1 className="text-sm font-black text-gray-800 tracking-widest uppercase">登山健行裝備拉霸機</h1>
-                                <p className="text-[10px] text-blue-600 font-bold mt-0.5">
-                                    ${budget.toLocaleString()} | {targetGender==='all'?'不拘':targetGender==='men'?'男':targetGender==='women'?'女':'童'} | { } 
-                                    {scenario==='all'?'通用':scenarioTips[scenario].title.split(' ')[1].split('【')[0]}
-                                </p>
-                            </div>
-                            <FeedbackHeaderBtn />
-                        </div>
-
-                        <div className="flex-1 flex flex-col justify-center p-2.5 gap-2 overflow-hidden z-10">
-                            {filteredDb && categoryOrder.map((cat) => (
-                                <SlotItem 
-                                    key={cat} category={cat} items={filteredDb[cat]}
-                                    selectedIndex={selections[cat]} isLocked={locked[cat]}
-                                    isSpinning={spinningStates[cat]}
-                                    onSelect={(idx) => setSelections(p => ({...p, [cat]: idx}))}
-                                    onToggleLock={() => {
-                                        const isCurrentlyLocked = locked[cat];
-                                        if (isCurrentlyLocked && filteredDb[cat]) {
-                                            const item = filteredDb[cat][selections[cat]];
-                                            if (item.isOwned || item.isCart || item.id.startsWith('own-')) {
-                                                setPresetItems(prev => prev.filter(i => i.id !== item.id));
-                                            }
-                                        }
-                                        setLocked(p => ({...p, [cat]: !p[cat]}));
-                                    }}
-                                />
-                            ))}
-                        </div>
-
-                        {/* 底部控制列 */}
-                        <div className="bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] rounded-t-2xl z-20 flex-shrink-0 pb-safe">
-                            <div className="p-4 flex justify-between items-center">
-                                
-                                <div className="flex flex-col items-start flex-1 pr-2">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">目前搭配總金額</span>
-                                    <span className={`text-2xl font-black font-price tracking-tighter transition-colors leading-none ${isOverBudget ? 'text-red-500' : 'text-gray-900'}`}>
-                                        ${currentTotal.toLocaleString()}
-                                    </span>
-                                    
-                                    {isOverBudget && (
-                                        <span className="text-[10px] font-bold text-red-500 font-price animate-pulse mt-1.5">
-                                            ⚠️ 超出預算 ${(currentTotal - budget).toLocaleString()}
-                                        </span>
-                                    )}
-                                    
-                                    {ownedCount > 0 && (
-                                        <div className="flex flex-col space-y-0.5 mt-1.5">
-                                            <span className="text-[9px] text-gray-500 font-medium">✅ 扣除已購買/自備裝備</span>
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                <button 
-                                    onClick={handleSpinAll}
-                                    disabled={isAnySpinning}
-                                    className={`flex flex-col items-center justify-center px-5 py-3.5 rounded-xl text-xs font-black tracking-widest text-white shadow-md transition-all transform active:scale-95 uppercase flex-shrink-0 h-[68px] focus:outline-none ${isAnySpinning ? 'bg-gray-300 shadow-none' : 'bg-blue-600 hover:bg-blue-700'}`}
-                                >
-                                    {isAnySpinning ? (
-                                        <span className="animate-pulse">隨機搭配中...</span>
-                                    ) : (
-                                        <React.Fragment>
-                                            <DicesIcon />
-                                            <span className="mt-1">隨機搭配</span>
-                                        </React.Fragment>
-                                    )}
-                                </button>
-                                
-                            </div>
-                        </div>
-                        
-                        <BottomNav />
-                    </div>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+    // 初始渲染
+    updateUI();
+    loadConfig();
+  </script>
 </body>
 </html>
