@@ -69,7 +69,8 @@
           請選擇商區類型及編號。
         </p>
         
-        <div class="flex flex-col sm:flex-row gap-3">
+        <!-- 下拉式選單容器 (預設顯示) -->
+        <div id="normalLocationContainer" class="flex flex-col sm:flex-row gap-3">
           <!-- 類型選擇 -->
           <select id="locType" class="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none bg-gray-50/50 min-w-[140px]">
             <option value="">請選擇類型</option>
@@ -96,6 +97,16 @@
           </div>
         </div>
 
+        <!-- 手動輸入容器 (載入失敗時顯示) -->
+        <div id="manualLocationContainer" class="w-full d-none">
+          <input
+            type="text"
+            id="manualLocationInput"
+            placeholder="請手動輸入商區編號，例如：C1-3 或 B20"
+            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none transition-all bg-gray-50/50"
+          />
+        </div>
+
         <p id="dataSourceStatus" class="text-xs text-gray-400 mt-3 flex items-center gap-1">
           <i data-lucide="database" class="w-4 h-4"></i>
           目前使用系統預設編號資料
@@ -109,7 +120,7 @@
           2. 加入商品 Model Code
         </h2>
         <p class="text-sm text-gray-500 mb-4">
-          支援一次貼上多個貨號或使用相機掃描條碼。
+          支援一次貼上多個貨號或使用相機掃描 QR Code。
         </p>
         
         <div class="flex flex-col sm:flex-row gap-3">
@@ -233,6 +244,7 @@
     // 狀態管理
     let modelCodes = [];
     let isSubmitting = false;
+    let isManualLocationMode = false; // 新增：是否為手動輸入模式
 
     // ==========================================
     // 🔗 Google 表單送出設定區 
@@ -242,7 +254,7 @@
     const ENTRY_MODELS = "entry.1574742509";   
 
     // --- 商區編號設定 (Google Sheet 連結) ---
-    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlW93nNOC2e79n_wXpyjoLlFqE3b59yajqBRUt1qGe36yFaG7ImEsL_Nu8uJkrdI3GUuKq9Q08cTTo/pub?gid=427952482&single=true&output=csv"; 
+    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlW93nNOC2e79n_wXpyjoLlFqE3b59yajqBRUt1qGe36yFaG7ImEsL_Nu8uJkrdI3GUuKq9Q08cTTo/pub?gid=216640336&single=true&output=csv"; 
     
     let locationConfig = {
       TG: {
@@ -262,6 +274,11 @@
     const boxNumSelect = document.getElementById('boxNum');
     const dataSourceStatus = document.getElementById('dataSourceStatus');
     
+    // 新增：手動輸入模式的 DOM 元素
+    const normalLocationContainer = document.getElementById('normalLocationContainer');
+    const manualLocationContainer = document.getElementById('manualLocationContainer');
+    const manualLocationInput = document.getElementById('manualLocationInput');
+
     const bulkInput = document.getElementById('bulkInput');
     const btnAdd = document.getElementById('btnAdd');
     const btnScan = document.getElementById('btnScan');
@@ -346,6 +363,11 @@
 
     // 取得當前選擇的完整商區編號
     function getSelectedLocation() {
+      // 若為手動模式，直接回傳輸入框的值
+      if (isManualLocationMode) {
+        return manualLocationInput.value.trim();
+      }
+
       const type = locTypeSelect.value;
       if (type === 'TG') {
         const dept = tgDeptSelect.value;
@@ -511,6 +533,9 @@
 
     tgNumSelect.addEventListener('change', checkSubmitButtonState);
     boxNumSelect.addEventListener('change', checkSubmitButtonState);
+    
+    // 新增：手動輸入框的事件監聽
+    manualLocationInput.addEventListener('input', checkSubmitButtonState);
 
     mainForm.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -645,16 +670,25 @@
         console.warn("載入失敗:", err.message);
         
         if (err.message === "AUTH_ERROR") {
-          dataSourceStatus.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i>讀取失敗：權限非公開，已切換預設資料`;
+          dataSourceStatus.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i>讀取失敗：權限非公開，已自動切換為手動輸入`;
         } else {
-          dataSourceStatus.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4"></i>網路異常或網址錯誤，已切換回預設資料`;
+          dataSourceStatus.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4"></i>網路異常或資料錯誤，已自動切換為手動輸入`;
         }
         
         dataSourceStatus.className = "text-xs mt-3 flex items-center gap-1 text-red-500 font-bold";
+        
+        // --- 觸發手動輸入模式 ---
+        isManualLocationMode = true;
+        normalLocationContainer.classList.add('d-none');
+        manualLocationContainer.classList.remove('d-none');
+        checkSubmitButtonState();
       }
       
       lucide.createIcons();
-      initDropdowns();
+      // 只有在非手動模式才需要初始化選單
+      if (!isManualLocationMode) {
+        initDropdowns();
+      }
     }
 
     // 初始渲染
