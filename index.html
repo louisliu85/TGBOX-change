@@ -50,6 +50,13 @@
     stroke-dasharray: 100, 100;
     animation: drawCheck 0.6s ease-out forwards;
   }
+
+  /* 針對 iOS Safari 相機比例修正，強制鏡頭畫面填滿且不變形 */
+  #qr-reader video {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
 </style>
 </head>
 <body class="text-slate-800 antialiased font-sans h-[100dvh] overflow-hidden">
@@ -57,8 +64,8 @@
 <!-- 最外層 App 容器 -->
 <div id="app" class="relative w-full max-w-md mx-auto h-full flex flex-col bg-white overflow-hidden shadow-2xl shadow-slate-200/50">
   
-  <!-- ============ 解鎖畫面 ============ -->
-  <div id="authView" class="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
+  <!-- ============ 解鎖畫面 (層級最高 z-[70]) ============ -->
+  <div id="authView" class="absolute inset-0 z-[70] bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
     <div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-6 border-2 border-slate-100 shadow-sm">
       <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
     </div>
@@ -178,7 +185,7 @@
       <div class="w-1/4 h-full overflow-y-auto p-5 pb-10">
         
         <div class="flex gap-3 mb-6">
-          <input type="text" id="bulkInput" placeholder="輸入或貼上貨號" class="flex-1 bg-white border-2 border-slate-200 text-slate-700 font-bold text-[15px] rounded-xl px-4 py-3.5 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-slate-400 shadow-sm min-w-0">
+          <input type="text" id="bulkInput" placeholder="輸入 Model Code，多個可用空格隔開" class="flex-1 bg-white border-2 border-slate-200 text-slate-700 font-bold text-[14px] rounded-xl px-3 py-3.5 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-[12.5px] placeholder:font-medium placeholder:text-slate-400 shadow-sm min-w-0">
           <button id="btnAdd" class="px-5 bg-white border-2 border-primary text-primary rounded-xl font-bold text-[15px] shadow-sm active:bg-primary/5 transition-colors shrink-0">加入</button>
         </div>
 
@@ -227,7 +234,7 @@
             <path d="M5 13l4 4L19 7"></path>
           </svg>
         </div>
-        <h2 class="text-2xl font-extrabold text-slate-800 mb-2 tracking-tight">更新成功</h2>
+        <h2 class="text-2xl font-extrabold text-slate-800 mb-2 tracking-tight">他被拯救了！</h2>
         <p class="text-[15px] font-bold text-slate-500 text-center mb-10 leading-relaxed">
           <span id="successLocText" class="text-primary">-</span> 的商品資料<br>已成功同步至後台資料庫
         </p>
@@ -246,8 +253,8 @@
 
 </div>
 
-<!-- ============ 掃描 Bottom Sheet ============ -->
-<div id="scanSheet" class="absolute inset-0 z-50 pointer-events-none">
+<!-- ============ 掃描 Bottom Sheet (平時以 hidden 隱藏防止擋住點擊) ============ -->
+<div id="scanSheet" class="absolute inset-0 z-[60] hidden">
   <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" id="scanBg"></div>
   <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl transform translate-y-full transition-transform duration-300 pointer-events-auto flex flex-col max-h-[85vh]" id="scanContent">
     <div class="flex justify-center pt-3 pb-2"><div class="w-12 h-1.5 bg-slate-200 rounded-full"></div></div>
@@ -273,8 +280,8 @@
   </div>
 </div>
 
-<!-- ============ 警告：Item Code 錯誤提示 Modal ============ -->
-<div id="invalidCodeModal" class="absolute inset-0 z-[60] pointer-events-none flex items-center justify-center p-4">
+<!-- ============ 警告：Item Code 錯誤提示 Modal (平時以 hidden 隱藏) ============ -->
+<div id="invalidCodeModal" class="absolute inset-0 z-[80] hidden items-center justify-center p-4">
   <div id="invalidCodeBg" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
   <div id="invalidCodeContent" class="relative bg-white rounded-[24px] shadow-2xl w-full max-w-[320px] transform scale-95 opacity-0 transition-all duration-300 flex flex-col overflow-hidden">
     <div class="p-6 pb-5 flex flex-col items-center text-center">
@@ -282,7 +289,7 @@
         <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
       </div>
       <h3 class="text-[17px] font-extrabold text-slate-800 mb-2">你可能輸入了 Item Code</h3>
-      <p class="text-[13px] font-bold text-slate-500 mb-4 leading-relaxed">請檢查商品明細，以下<span class="text-amber-600">非 8 或 9 開頭</span>的號碼已被自動排除：</p>
+      <p class="text-[13px] font-bold text-slate-500 mb-4 leading-relaxed">請輸入 Model Code，以下貨號已被自動排除：</p>
       <div id="invalidCodeList" class="w-full max-h-[120px] overflow-y-auto bg-slate-50 border-2 border-slate-100 rounded-xl p-3 flex flex-wrap gap-2 justify-center no-scrollbar">
         <!-- 動態插入錯誤號碼 -->
       </div>
@@ -319,7 +326,6 @@
   let locConfig = { TG: { "C1": ["1","2","3"], "C2": ["1","2"] }, Box: ["B01","B02","B03"] };
   let isManualLoc = false;
   
-  // 現在總共有 4 個步驟了
   let currentStep = 1; 
   let locType = 'TG'; 
   let modelCodes = [];
@@ -405,11 +411,14 @@
     
     listContainer.innerHTML = invalidList.map(c => `<span class="px-2.5 py-1 bg-white text-slate-600 border-2 border-slate-100 font-bold text-[13px] rounded-lg shadow-sm">${c}</span>`).join('');
     
-    modal.classList.remove('pointer-events-none');
-    setTimeout(() => {
-      bg.classList.remove('opacity-0');
-      content.classList.remove('opacity-0', 'scale-95');
-    }, 10);
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        bg.classList.remove('opacity-0');
+        content.classList.remove('opacity-0', 'scale-95');
+      });
+    });
   }
 
   function closeInvalidCodeModal() {
@@ -420,7 +429,8 @@
     bg.classList.add('opacity-0');
     content.classList.add('opacity-0', 'scale-95');
     setTimeout(() => {
-      modal.classList.add('pointer-events-none');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
     }, 300);
   }
 
@@ -453,11 +463,10 @@
   function validateStep(step) {
     if (step === 1) return getSelectedLoc() !== '';
     if (step === 2) return modelCodes.length > 0;
-    return true; // 3 和 4 都不需要額外驗證
+    return true; 
   }
 
   function renderView() {
-    // 因為 w-[400%]，每次移動 25% (1/4)
     viewContainer.style.transform = `translateX(-${(currentStep - 1) * 25}%)`;
     
     if (currentStep < 4) {
@@ -466,7 +475,6 @@
       headerTitle.innerText = titles[currentStep - 1];
       headerProgress.style.width = `${(currentStep / 3) * 100}%`;
     } else {
-      // 進入第四步隱藏頂部 Header
       mainHeader.style.opacity = '0';
       setTimeout(() => mainHeader.style.display = 'none', 300);
     }
@@ -490,10 +498,9 @@
     if (currentStep === 3) renderConfirmView();
     if (currentStep === 4) {
       document.getElementById('successLocText').innerText = getSelectedLoc();
-      // 重置打勾動畫
       const checkSvg = document.querySelector('.animate-draw-check');
       checkSvg.style.animation = 'none';
-      checkSvg.offsetHeight; /* trigger reflow */
+      checkSvg.offsetHeight; 
       checkSvg.style.animation = null; 
     }
     
@@ -508,9 +515,9 @@
     if (!validateStep(currentStep)) return;
     
     if (currentStep === 3) {
-      submitForm(); // 第三步點擊送出
+      submitForm();
     } else if (currentStep === 4) {
-      resetAll(); // 第四步點擊返回首頁
+      resetAll();
     } else {
       currentStep++;
       renderView();
@@ -790,7 +797,7 @@
   });
 
   // ------------------------------------
-  // 掃描器 (Bottom Sheet)
+  // 掃描器 (Bottom Sheet) 
   // ------------------------------------
   let html5QrCode = null;
   const scanSheet = document.getElementById('scanSheet');
@@ -799,18 +806,20 @@
   const scanStatusMsg = document.getElementById('scanStatusMsg');
 
   function openScanSheet() {
-    scanSheet.classList.remove('pointer-events-none');
-    setTimeout(() => {
-      scanBg.classList.remove('opacity-0');
-      scanContent.classList.remove('translate-y-full');
-    }, 10);
+    scanSheet.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scanBg.classList.remove('opacity-0');
+        scanContent.classList.remove('translate-y-full');
+      });
+    });
     startScanner();
   }
   function closeScanSheet() {
     scanBg.classList.add('opacity-0');
     scanContent.classList.add('translate-y-full');
     setTimeout(() => {
-      scanSheet.classList.add('pointer-events-none');
+      scanSheet.classList.add('hidden');
       if (html5QrCode) {
         html5QrCode.stop().catch(()=>{});
       }
@@ -825,9 +834,10 @@
     scanStatusMsg.innerText = '請對準 QR Code';
     scanStatusMsg.className = 'text-center font-bold text-[13px] text-slate-500 mt-4 mb-4';
 
+    // 移除 aspectRatio，並設定明確的寬高，讓 iOS 自由適應
     html5QrCode.start(
       { facingMode: 'environment' },
-      { fps: 10, qrbox: 220, aspectRatio: 1.0 },
+      { fps: 10, qrbox: { width: 220, height: 220 } },
       (text) => {
         const m = text.match(/\d{6,8}/);
         if (m) {
@@ -860,7 +870,7 @@
   });
 
   // ------------------------------------
-  // Step 3: 確認與送出 (新增、移除、保留)
+  // Step 3: 確認與送出 
   // ------------------------------------
   function renderConfirmView() {
     document.getElementById('confirmLocText').innerText = getSelectedLoc();
@@ -962,7 +972,6 @@
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: fd.toString()
     }).then(() => {
-      // 成功後直接滑到第四步完成畫面
       currentStep = 4; 
       renderView();
     }).catch(() => {
@@ -979,7 +988,6 @@
     
     document.getElementById('snapshotView').style.display = 'none';
     
-    // 清空選擇的商區
     if(!isManualLoc) {
         document.getElementById('tgDept').value = '';
         document.getElementById('tgNum').innerHTML = '<option value="">選擇編號</option>';
@@ -991,16 +999,11 @@
     currentStep = 1;
     renderView();
     updateItemsGrid();
-    onLocChange(); // 重新觸發狀態驗證，讓下一步按鈕鎖死
+    onLocChange(); 
   }
 
   // Init
   updateDots();
 </script>
-<style>
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-</style>
 </body>
 </html>
-
-
