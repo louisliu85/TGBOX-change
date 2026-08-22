@@ -1,699 +1,1006 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>1769 TG & Box 品項更換表單</title>
-  
-  <!-- 引入 Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- 引入 Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>TG & Box 品項更換表單</title>
 
-  <!-- 引入 HTML5 QR Code 掃描器 -->
-  <script src="https://unpkg.com/html5-qrcode" async crossorigin="anonymous"></script>
+<!-- 引入字體：英文優先 Inter，中文使用 Noto Sans TC -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- QR Code 掃描器 -->
+<script src="https://unpkg.com/html5-qrcode" async crossorigin="anonymous"></script>
 
-  <!-- 自訂卷軸與實用樣式 -->
-  <style>
-    .custom-scrollbar::-webkit-scrollbar {
-      height: 8px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 99px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
-    .d-none {
-      display: none !important;
-    }
-  </style>
-</head>
-<body class="min-h-screen bg-[#f8fafc] py-10 px-4 sm:px-6 lg:px-8 font-sans relative">
-  
-  <div class="max-w-4xl mx-auto space-y-6">
-    
-    <!-- 全新輕量化 Header -->
-    <div class="pb-4 border-b border-gray-200 flex flex-col md:flex-row md:items-end justify-between gap-4">
-      <div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight flex items-start sm:items-center gap-3">
-          <i data-lucide="box" class="text-[#3643ba] w-8 h-8 shrink-0 mt-0.5 sm:mt-0"></i>
-          <span class="leading-snug">
-            1769 TG & Box
-            <span class="text-[#3643ba] block sm:inline mt-1 sm:mt-0">品項更換表單</span>
-          </span>
-        </h1>
-        <p class="mt-2 text-gray-500 text-sm">
-          只要有增減品項都請填寫此表單，填完後也要記得更換 CubeInStore 數據唷！
-        </p>
-      </div>
-      <div id="itemCount" class="text-sm text-gray-400 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm self-start md:self-auto shrink-0">
-        共 0 件商品
-      </div>
-    </div>
-
-    <form id="mainForm" class="space-y-6">
-      
-      <!-- 區塊 1：商區設定 -->
-      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
-        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
-          <i data-lucide="map-pin" class="text-[#3643ba] w-5 h-5"></i>
-          1. 商區設定
-        </h2>
-        <p class="text-sm text-gray-500 mb-4">
-          請選擇商區類型及編號。
-        </p>
-        
-        <!-- 下拉式選單容器 (預設顯示) -->
-        <div id="normalLocationContainer" class="flex flex-col sm:flex-row gap-3">
-          <!-- 類型選擇 -->
-          <select id="locType" class="px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none bg-gray-50/50 min-w-[140px]">
-            <option value="">請選擇類型</option>
-            <option value="TG">TG</option>
-            <option value="Box">Box</option>
-          </select>
-
-          <!-- TG 專用選單 (預設隱藏) -->
-          <div id="tgSelects" class="flex flex-1 gap-3 d-none">
-            <select id="tgDept" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none bg-gray-50/50">
-              <option value="">選擇部門</option>
-            </select>
-            <span class="flex items-center text-gray-400 font-bold">-</span>
-            <select id="tgNum" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none bg-gray-50/50">
-              <option value="">選擇編號</option>
-            </select>
-          </div>
-
-          <!-- Box 專用選單 (預設隱藏) -->
-          <div id="boxSelects" class="flex flex-1 gap-3 d-none">
-            <select id="boxNum" class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none bg-gray-50/50">
-              <option value="">選擇 Box 編號</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- 手動輸入容器 (載入失敗時顯示) -->
-        <div id="manualLocationContainer" class="w-full d-none">
-          <input
-            type="text"
-            id="manualLocationInput"
-            placeholder="請手動輸入商區編號，例如：C1-3 或 B20"
-            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none transition-all bg-gray-50/50"
-          />
-        </div>
-
-        <p id="dataSourceStatus" class="text-xs text-gray-400 mt-3 flex items-center gap-1">
-          <i data-lucide="database" class="w-4 h-4"></i>
-          目前使用系統預設編號資料
-        </p>
-      </div>
-
-      <!-- 區塊 2：加入商品 -->
-      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
-        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
-          <i data-lucide="package-plus" class="text-[#3643ba] w-5 h-5"></i>
-          2. 填入全部商品的 Model Code
-        </h2>
-        <p class="text-sm text-gray-500 mb-4">
-          請填入更換後商區中的所有商品，支援一次貼上多個貨號或使用相機掃描 QR Code。
-        </p>
-        
-        <div class="flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            id="bulkInput"
-            placeholder="貼上貨號，例如：8526140 8516193..."
-            class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#3643ba]/20 focus:border-[#3643ba] outline-none transition-all bg-gray-50/50"
-          />
-          <button
-            type="button"
-            id="btnScan"
-            class="bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-100 px-5 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 shrink-0"
-          >
-            <i data-lucide="camera" class="w-[18px] h-[18px]"></i>
-            掃描
-          </button>
-          <button
-            type="button"
-            id="btnAdd"
-            class="bg-white text-[#3643ba] border-2 border-[#3643ba] hover:bg-[#3643ba] hover:text-white px-6 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 shrink-0"
-          >
-            <i data-lucide="plus" class="w-[18px] h-[18px]"></i>
-            加入
-          </button>
-        </div>
-      </div>
-
-      <!-- 區塊 3：預覽與確認 -->
-      <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
-        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
-          <i data-lucide="check-square" class="text-[#3643ba] w-5 h-5"></i>
-          3. 預覽與確認
-        </h2>
-        <p class="text-sm text-gray-500 mb-4">
-          左右滑動確認商品，點按圖片即可刪除。
-        </p>        
-
-        <!-- 圖片預覽區 -->
-        <div class="mb-6">
-          <!-- 有資料時顯示的容器 -->
-          <div id="previewContainer" class="flex overflow-x-auto gap-4 pb-4 custom-scrollbar d-none">
-            <!-- 圖片將由 JavaScript 動態插入於此 -->
-          </div>
-          
-          <!-- 無資料時顯示的空白狀態 -->
-          <div id="emptyState" class="py-12 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400">
-            <i data-lucide="image" class="w-12 h-12 mb-3 opacity-20"></i>
-            <p>尚未加入任何商品</p>
-          </div>
-        </div>
-
-        <!-- 最終表單資料 -->
-        <div class="space-y-3 mb-8">
-          <label class="block text-sm font-semibold text-gray-600">
-            最終輸出格式（自動生成）
-          </label>
-          <textarea
-            id="finalTextarea"
-            readonly
-            placeholder="此處將自動填入以空格隔開的商品清單..."
-            class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/80 text-gray-600 outline-none h-24 resize-none font-mono text-sm"
-          ></textarea>
-        </div>
-
-        <!-- 訊息提示區 (成功/錯誤) -->
-        <div id="statusMessage" class="mb-4 p-4 rounded-xl border flex items-center gap-3 d-none">
-          <!-- 內容由 JS 動態填入 -->
-        </div>
-
-        <!-- 送出按鈕 -->
-        <button
-          type="submit"
-          id="submitBtn"
-          disabled
-          class="w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all duration-200 bg-gray-200 text-gray-400 cursor-not-allowed"
-        >
-          <i data-lucide="send" class="w-5 h-5"></i>
-          <span id="submitBtnText">確認無誤，送出資料</span>
-        </button>
-        
-      </div>
-    </form>
-  </div>
-
-  <!-- =============================== -->
-  <!-- 掃描器 Modal 視窗 -->
-  <!-- =============================== -->
-  <div id="scannerModal" class="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-opacity d-none">
-    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden flex flex-col shadow-2xl">
-      <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-        <h3 class="font-bold text-gray-800 flex items-center gap-2">
-          <i data-lucide="camera" class="text-[#3643ba] w-5 h-5"></i> 
-          掃描商品條碼
-        </h3>
-        <button 
-          type="button"
-          id="btnCloseScanner"
-          class="p-2 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 transition-colors"
-          title="關閉掃描器"
-        >
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      
-      <!-- 相機預覽畫面容器 -->
-      <div class="bg-black relative w-full flex justify-center items-center overflow-hidden min-h-[300px]">
-        <div id="qr-reader" class="w-full"></div>
-      </div>
-      
-      <div id="scanStatusText" class="p-4 text-sm text-center text-gray-700 bg-gray-50 font-medium break-all">
-        請將相機對準商品條碼或 QR Code
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // 初始化 Lucide 圖示
-    lucide.createIcons();
-
-    // 狀態管理
-    let modelCodes = [];
-    let isSubmitting = false;
-    let isManualLocationMode = false; // 新增：是否為手動輸入模式
-
-    // ==========================================
-    // 🔗 Google 表單送出設定區 
-    // ==========================================
-    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfF8Wq565jbS1v6wk8_m0VNFoQn35BP34SLitRFJtpCSNYrRQ/formResponse"; 
-    const ENTRY_LOCATION = "entry.795130238"; 
-    const ENTRY_MODELS = "entry.1574742509";   
-
-    // --- 商區編號設定 (Google Sheet 連結) ---
-    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlW93nNOC2e79n_wXpyjoLlFqE3b59yajqBRUt1qGe36yFaG7ImEsL_Nu8uJkrdI3GUuKq9Q08cTTo/pub?gid=216640336&single=true&output=csv"; 
-    
-    let locationConfig = {
-      TG: {
-        "C1": ["1", "2", "3", "4"],
-        "C2": ["1", "2"],
-        "C3": ["1"]
-      },
-      Box: ["B01", "B02", "B03", "B04", "B05"]
-    };
-
-    // DOM 元素選取
-    const locTypeSelect = document.getElementById('locType');
-    const tgSelects = document.getElementById('tgSelects');
-    const boxSelects = document.getElementById('boxSelects');
-    const tgDeptSelect = document.getElementById('tgDept');
-    const tgNumSelect = document.getElementById('tgNum');
-    const boxNumSelect = document.getElementById('boxNum');
-    const dataSourceStatus = document.getElementById('dataSourceStatus');
-    
-    // 新增：手動輸入模式的 DOM 元素
-    const normalLocationContainer = document.getElementById('normalLocationContainer');
-    const manualLocationContainer = document.getElementById('manualLocationContainer');
-    const manualLocationInput = document.getElementById('manualLocationInput');
-
-    const bulkInput = document.getElementById('bulkInput');
-    const btnAdd = document.getElementById('btnAdd');
-    const btnScan = document.getElementById('btnScan');
-    const previewContainer = document.getElementById('previewContainer');
-    const emptyState = document.getElementById('emptyState');
-    const finalTextarea = document.getElementById('finalTextarea');
-    const itemCount = document.getElementById('itemCount');
-    const submitBtn = document.getElementById('submitBtn');
-    const submitBtnText = document.getElementById('submitBtnText');
-    const statusMessage = document.getElementById('statusMessage');
-    const mainForm = document.getElementById('mainForm');
-
-    // 掃描器 DOM 與狀態
-    const scannerModal = document.getElementById('scannerModal');
-    const btnCloseScanner = document.getElementById('btnCloseScanner');
-    const scanStatusText = document.getElementById('scanStatusText');
-    let html5QrCodeScanner = null;
-    let isStartingScanner = false;
-
-    // 顯示狀態提示訊息
-    function showMessage(type, text) {
-      statusMessage.classList.remove('d-none');
-      if (type === 'success') {
-        statusMessage.className = 'mb-4 p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 flex items-center gap-3';
-        statusMessage.innerHTML = `<div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div><span class="font-medium">${text}</span>`;
-      } else {
-        statusMessage.className = 'mb-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center gap-3';
-        statusMessage.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5 text-red-500 shrink-0"></i><span class="font-medium">${text}</span>`;
-        lucide.createIcons();
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+        },
+        colors: {
+          primary: '#3643ba',
+          primaryDark: '#262f8c',
+        }
       }
-      
-      setTimeout(() => {
-        statusMessage.classList.add('d-none');
-      }, 8000);
     }
+  }
+</script>
 
-    // 更新畫面
-    function updateUI() {
-      itemCount.innerText = `共 ${modelCodes.length} 件商品`;
-      finalTextarea.value = modelCodes.join(' ');
+<style>
+  /* 鎖死 body，防止原生網頁的橡皮筋滾動效果 */
+  body {
+    background-color: #f8fafc;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  
+  /* 完成畫面的打勾動畫 */
+  @keyframes drawCheck {
+    0% { stroke-dasharray: 0, 100; opacity: 0; }
+    10% { opacity: 1; }
+    100% { stroke-dasharray: 100, 0; opacity: 1; }
+  }
+  .animate-draw-check {
+    stroke-dasharray: 100, 100;
+    animation: drawCheck 0.6s ease-out forwards;
+  }
+</style>
+</head>
+<body class="text-slate-800 antialiased font-sans h-[100dvh] overflow-hidden">
 
-      if (modelCodes.length > 0) {
-        emptyState.classList.add('d-none');
-        previewContainer.classList.remove('d-none');
-        previewContainer.innerHTML = '';
+<!-- 最外層 App 容器 -->
+<div id="app" class="relative w-full max-w-md mx-auto h-full flex flex-col bg-white overflow-hidden shadow-2xl shadow-slate-200/50">
+  
+  <!-- ============ 解鎖畫面 ============ -->
+  <div id="authView" class="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
+    <div class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-6 border-2 border-slate-100 shadow-sm">
+      <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+    </div>
+    <h1 class="text-2xl font-extrabold text-slate-800 mb-2">請輸入店號</h1>
+    <p class="text-sm font-semibold text-slate-500 mb-8">TG & Box 品項更換表單</p>
+
+    <div class="flex gap-4 mb-12">
+      <div class="auth-dot w-4 h-4 rounded-full bg-slate-200 transition-colors duration-200"></div>
+      <div class="auth-dot w-4 h-4 rounded-full bg-slate-200 transition-colors duration-200"></div>
+      <div class="auth-dot w-4 h-4 rounded-full bg-slate-200 transition-colors duration-200"></div>
+      <div class="auth-dot w-4 h-4 rounded-full bg-slate-200 transition-colors duration-200"></div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 w-full max-w-[260px]">
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">1</button>
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">2</button>
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">3</button>
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">4</button>
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">5</button>
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">6</button>
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">7</button>
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">8</button>
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">9</button>
+      <div></div>
+      <button class="numpad-btn h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm text-2xl font-bold active:bg-slate-100 active:scale-95 transition-all">0</button>
+      <button id="btnNumpadDel" class="h-14 rounded-2xl bg-white border-2 border-slate-100 shadow-sm flex items-center justify-center text-slate-400 active:bg-slate-100 active:scale-95 transition-all">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z"></path></svg>
+      </button>
+    </div>
+    <div id="authErrorMsg" class="mt-8 text-sm font-bold text-red-500 opacity-0 transition-opacity">密碼錯誤，請重試</div>
+  </div>
+
+  <!-- ============ 主畫面 ============ -->
+  
+  <!-- [凍結] Top App Bar -->
+  <header id="mainHeader" class="flex-none w-full bg-white border-b-2 border-slate-100 px-4 py-3 flex items-center z-20 relative shadow-sm transition-opacity duration-300">
+    <button id="btnNavBack" class="w-10 h-10 rounded-full flex items-center justify-center active:bg-slate-100 transition-colors invisible">
+      <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+    </button>
+    <h2 id="headerTitle" class="flex-1 text-center font-extrabold text-lg text-slate-800 tracking-tight">1. 選擇商區</h2>
+    <div class="w-10 h-10"></div>
+    <div class="absolute bottom-0 left-0 h-1 bg-slate-100 w-full">
+      <div id="headerProgress" class="h-full bg-primary transition-all duration-300 w-1/4 rounded-r-full"></div>
+    </div>
+  </header>
+
+  <!-- [獨立滾動區] 內容區 (寬度擴展為 400% 以容納 4 個 View) -->
+  <main class="flex-1 overflow-hidden relative bg-white">
+    <div id="viewContainer" class="flex w-[400%] h-full transition-transform duration-300 ease-in-out">
+      
+      <!-- === VIEW 1: 商區 === -->
+      <div class="w-1/4 h-full overflow-y-auto p-5 pb-10">
+        <div class="flex items-center gap-2 mb-4">
+          <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          <h3 class="font-extrabold text-slate-700 text-[15px]">設定更換區域</h3>
+        </div>
         
-        modelCodes.forEach(code => {
-          const itemDiv = document.createElement('div');
-          itemDiv.className = 'relative group shrink-0';
-          itemDiv.innerHTML = `
-            <div class="w-36 h-36 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
-              <img 
-                src="https://product-picture.decathlon.cn/model/${code}.jpg?f=500"
-                alt="Model ${code}"
-                onerror="this.src='https://via.placeholder.com/150x150.png?text=No+Image'"
-                class="w-full h-full object-cover p-2"
-              />
-              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                <button
-                  type="button"
-                  onclick="handleDelete('${code}')"
-                  class="bg-red-500 text-white p-2.5 rounded-full hover:bg-red-600 transform hover:scale-110 transition-all shadow-lg"
-                  title="移除此商品"
-                >
-                  <i data-lucide="trash-2" class="w-5 h-5"></i>
-                </button>
+        <div id="dataSourceStatus" class="flex items-center gap-2 text-xs font-bold text-slate-500 mb-6 bg-white border-2 border-slate-100 rounded-lg p-2.5 shadow-sm">
+          <svg class="w-4 h-4 animate-spin text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          正在同步後台商區資料...
+        </div>
+
+        <div id="standardLocGroup" class="space-y-4 mb-8">
+          <div class="flex bg-white p-1 rounded-xl shadow-sm border-2 border-slate-100 relative">
+            <div id="locTypeBg" class="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-primary rounded-lg transition-all duration-200"></div>
+            <button type="button" class="loc-tab-btn relative z-10 flex-1 py-3 text-[14px] font-bold text-white transition-colors" data-type="TG">TG</button>
+            <button type="button" class="loc-tab-btn relative z-10 flex-1 py-3 text-[14px] font-bold text-slate-500 transition-colors" data-type="Box">Box</button>
+          </div>
+
+          <div id="tgSelects" class="flex items-center gap-2">
+            <div class="relative flex-1">
+              <select id="tgDept" class="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold text-[15px] rounded-xl pl-4 pr-10 py-3.5 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all appearance-none shadow-sm"><option value="">選擇部門</option></select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
               </div>
             </div>
-            <div class="text-center mt-3 text-sm font-bold text-gray-700">
-              ${code}
+            
+            <span class="text-slate-400 font-extrabold shrink-0">-</span>
+            
+            <div class="relative flex-1">
+              <select id="tgNum" class="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold text-[15px] rounded-xl pl-4 pr-10 py-3.5 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all appearance-none shadow-sm"><option value="">選擇編號</option></select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
             </div>
-          `;
-          previewContainer.appendChild(itemDiv);
-        });
-        lucide.createIcons();
+          </div>
+          
+          <div id="boxSelects" class="hidden">
+            <div class="relative w-full">
+              <select id="boxNum" class="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold text-[15px] rounded-xl pl-4 pr-10 py-3.5 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all appearance-none shadow-sm"><option value="">選擇 Box 編號</option></select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="manualLocGroup" class="hidden mb-8">
+          <input type="text" id="manualLocInput" placeholder="輸入商區 (例如: C1-3)" class="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold text-[15px] rounded-xl px-4 py-3.5 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-slate-400 shadow-sm">
+        </div>
+
+        <div class="border-t-2 border-slate-100 pt-6">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-extrabold text-slate-700 text-[15px] flex items-center gap-2">
+              <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+              目前現有商品紀錄
+            </h3>
+            <button id="btnLoadSnapshot" disabled class="w-9 h-9 flex items-center justify-center rounded-full transition-colors text-primary bg-primary/10 active:bg-primary/20 disabled:opacity-50 disabled:bg-slate-100 disabled:text-slate-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
+          </div>
+          <div id="snapshotView" class="hidden transition-opacity"></div>
+        </div>
+      </div>
+
+      <!-- === VIEW 2: 商品 === -->
+      <div class="w-1/4 h-full overflow-y-auto p-5 pb-10">
+        
+        <div class="flex gap-3 mb-6">
+          <input type="text" id="bulkInput" placeholder="輸入或貼上貨號" class="flex-1 bg-white border-2 border-slate-200 text-slate-700 font-bold text-[15px] rounded-xl px-4 py-3.5 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-slate-400 shadow-sm min-w-0">
+          <button id="btnAdd" class="px-5 bg-white border-2 border-primary text-primary rounded-xl font-bold text-[15px] shadow-sm active:bg-primary/5 transition-colors shrink-0">加入</button>
+        </div>
+
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-extrabold text-slate-700 text-[15px] flex items-center gap-2">
+            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+            已加入清單
+          </h3>
+          <span id="itemCountBadge" class="px-3 py-1 bg-primary/10 text-primary text-[12px] font-bold rounded-full">0 件</span>
+        </div>
+
+        <div id="itemsGrid" class="flex flex-col gap-3">
+          <div class="py-12 flex flex-col items-center justify-center bg-white border-2 border-dashed border-slate-200 rounded-2xl text-slate-400">
+            <svg class="w-10 h-10 mb-3 opacity-30" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <p class="text-[13px] font-bold">尚未加入任何商品</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- === VIEW 3: 確認 === -->
+      <div class="w-1/4 h-full overflow-y-auto p-5 pb-10">
+        
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-4 mb-6 shadow-sm flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+          </div>
+          <div>
+            <p class="text-[11px] font-bold text-slate-400 mb-0.5">目標商區</p>
+            <p id="confirmLocText" class="text-xl font-extrabold text-slate-800 tracking-tight">-</p>
+          </div>
+        </div>
+
+        <div id="diffView"></div>
+
+        <div class="mt-8">
+           <label class="block text-[12px] font-bold text-slate-400 mb-2">貨號輸出預覽</label>
+           <textarea id="finalTextarea" readonly class="w-full h-20 bg-white border-2 border-slate-100 text-slate-500 text-[13px] font-bold rounded-xl p-3 outline-none resize-none shadow-inner tracking-wide"></textarea>
+        </div>
+      </div>
+
+      <!-- === VIEW 4: 完成畫面 === -->
+      <div class="w-1/4 h-full flex flex-col items-center justify-center p-6 bg-white">
+        <div class="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center mb-6 relative">
+          <!-- 繪製打勾的 SVG 動畫 -->
+          <svg class="w-12 h-12 text-green-500 animate-draw-check" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-800 mb-2 tracking-tight">更新成功</h2>
+        <p class="text-[15px] font-bold text-slate-500 text-center mb-10 leading-relaxed">
+          <span id="successLocText" class="text-primary">-</span> 的商品資料<br>已成功同步至後台資料庫
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- [凍結] Bottom Action Bar -->
+  <div id="bottomBar" class="flex-none w-full bg-white/95 backdrop-blur-md border-t-2 border-slate-100 p-4 pb-safe flex gap-3 z-20 relative transition-transform duration-300">
+    <button id="btnOpenScan" class="hidden h-14 bg-white border-2 border-primary text-primary rounded-xl font-bold text-[15px] items-center justify-center gap-2 active:bg-primary/5 transition-colors shadow-sm" style="flex: 0.8;">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+    </button>
+    <button id="btnMainAction" class="flex-1 h-14 bg-primary text-white rounded-xl font-bold text-[16px] shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-[0.98] active:bg-primaryDark transition-all disabled:opacity-50 disabled:shadow-none">下一步</button>
+  </div>
+
+</div>
+
+<!-- ============ 掃描 Bottom Sheet ============ -->
+<div id="scanSheet" class="absolute inset-0 z-50 pointer-events-none">
+  <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" id="scanBg"></div>
+  <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl transform translate-y-full transition-transform duration-300 pointer-events-auto flex flex-col max-h-[85vh]" id="scanContent">
+    <div class="flex justify-center pt-3 pb-2"><div class="w-12 h-1.5 bg-slate-200 rounded-full"></div></div>
+    <div class="px-5 pb-4 flex justify-between items-center border-b-2 border-slate-50">
+      <h3 class="font-extrabold text-[16px] text-slate-800">掃描 QR Code</h3>
+      <button id="btnCloseScan" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 active:bg-slate-200">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="p-5 flex-1 overflow-y-auto">
+      <div class="aspect-square bg-slate-900 rounded-2xl overflow-hidden relative shadow-inner">
+        <div id="qr-reader" class="w-full h-full object-cover"></div>
+      </div>
+      <p id="scanStatusMsg" class="text-center font-bold text-[13px] text-slate-500 mt-4 mb-4">請對準 QR Code</p>
+      
+      <!-- 檔案上傳備案 -->
+      <label class="flex items-center justify-center gap-2 w-full py-3.5 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl text-[13px] font-bold text-slate-600 active:bg-slate-100 cursor-pointer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+        相機打不開？點此上傳 QR Code 照片
+        <input type="file" id="fileQrInput" accept="image/*" class="hidden">
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 警告：Item Code 錯誤提示 Modal ============ -->
+<div id="invalidCodeModal" class="absolute inset-0 z-[60] pointer-events-none flex items-center justify-center p-4">
+  <div id="invalidCodeBg" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+  <div id="invalidCodeContent" class="relative bg-white rounded-[24px] shadow-2xl w-full max-w-[320px] transform scale-95 opacity-0 transition-all duration-300 flex flex-col overflow-hidden">
+    <div class="p-6 pb-5 flex flex-col items-center text-center">
+      <div class="w-14 h-14 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mb-4 shadow-inner">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      </div>
+      <h3 class="text-[17px] font-extrabold text-slate-800 mb-2">你可能輸入了 Item Code</h3>
+      <p class="text-[13px] font-bold text-slate-500 mb-4 leading-relaxed">請檢查商品明細，以下<span class="text-amber-600">非 8 或 9 開頭</span>的號碼已被自動排除：</p>
+      <div id="invalidCodeList" class="w-full max-h-[120px] overflow-y-auto bg-slate-50 border-2 border-slate-100 rounded-xl p-3 flex flex-wrap gap-2 justify-center no-scrollbar">
+        <!-- 動態插入錯誤號碼 -->
+      </div>
+    </div>
+    <div class="p-4 pt-0">
+      <button id="btnInvalidCodeOk" class="w-full h-12 bg-amber-500 text-white rounded-xl font-bold text-[15px] active:bg-amber-600 transition-colors shadow-sm">我知道了</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast 提示 -->
+<div id="toast" class="absolute top-4 left-4 right-4 bg-white rounded-xl shadow-lg border-2 border-slate-100 p-4 transform -translate-y-24 opacity-0 transition-all duration-300 z-[100] flex items-start gap-3 pointer-events-none">
+  <div id="toastIcon"></div>
+  <div id="toastMsg" class="text-[13.5px] font-bold text-slate-700 leading-tight flex-1 pt-0.5"></div>
+</div>
+
+<script>
+  // ------------------------------------
+  // 配置設定
+  // ------------------------------------
+  const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfF8Wq565jbS1v6wk8_m0VNFoQn35BP34SLitRFJtpCSNYrRQ/formResponse";
+  const ENTRY_LOCATION = "entry.795130238";
+  const ENTRY_MODELS = "entry.1574742509";
+  const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlW93nNOC2e79n_wXpyjoLlFqE3b59yajqBRUt1qGe36yFaG7ImEsL_Nu8uJkrdI3GUuKq9Q08cTTo/pub?gid=216640336&single=true&output=csv";
+  const GOOGLE_RESPONSES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlW93nNOC2e79n_wXpyjoLlFqE3b59yajqBRUt1qGe36yFaG7ImEsL_Nu8uJkrdI3GUuKq9Q08cTTo/pub?gid=155045588&single=true&output=csv";
+
+  const SVG_ICONS = {
+    check: `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>`,
+    error: `<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+  };
+
+  const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect><circle cx='8.5' cy='8.5' r='1.5'></circle><polyline points='21 15 16 10 5 21'></polyline></svg>`;
+
+  let locConfig = { TG: { "C1": ["1","2","3"], "C2": ["1","2"] }, Box: ["B01","B02","B03"] };
+  let isManualLoc = false;
+  
+  // 現在總共有 4 個步驟了
+  let currentStep = 1; 
+  let locType = 'TG'; 
+  let modelCodes = [];
+  let previousSnapshot = null;
+  let snapshotForLoc = null;
+  let isFetchingSnapshot = false;
+
+  // ------------------------------------
+  // 解鎖邏輯 (1769)
+  // ------------------------------------
+  const correctPin = '1769';
+  let inputPin = '';
+  const authDots = document.querySelectorAll('.auth-dot');
+  const authErrorMsg = document.getElementById('authErrorMsg');
+
+  function updateDots() {
+    authDots.forEach((dot, idx) => {
+      if (idx < inputPin.length) {
+        dot.classList.remove('bg-slate-200');
+        dot.classList.add('bg-primary', 'scale-110');
       } else {
-        emptyState.classList.remove('d-none');
-        previewContainer.classList.add('d-none');
+        dot.classList.add('bg-slate-200');
+        dot.classList.remove('bg-primary', 'scale-110');
       }
-      checkSubmitButtonState();
+    });
+  }
+
+  document.querySelectorAll('.numpad-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!btn.textContent) return; 
+      if (inputPin.length < 4) {
+        inputPin += btn.textContent;
+        updateDots();
+        authErrorMsg.style.opacity = '0';
+        if (inputPin.length === 4) setTimeout(checkPin, 150);
+      }
+    });
+  });
+
+  document.getElementById('btnNumpadDel').addEventListener('click', () => {
+    if (inputPin.length > 0) {
+      inputPin = inputPin.slice(0, -1);
+      updateDots();
+    }
+  });
+
+  function checkPin() {
+    if (inputPin === correctPin) {
+      document.getElementById('authView').style.transform = 'translateY(-100%)';
+      setTimeout(() => document.getElementById('authView').remove(), 500);
+      fetchConfig();
+    } else {
+      authErrorMsg.style.opacity = '1';
+      document.getElementById('authView').animate([
+        { transform: 'translateX(-8px)' }, { transform: 'translateX(8px)' },
+        { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }
+      ], { duration: 300, easing: 'ease-in-out' });
+      inputPin = '';
+      setTimeout(updateDots, 300);
+    }
+  }
+
+  // ------------------------------------
+  // Toast & Modal
+  // ------------------------------------
+  function showToast(type, msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastIcon').innerHTML = SVG_ICONS[type] || '';
+    document.getElementById('toastMsg').innerText = msg;
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+    setTimeout(() => {
+      toast.style.transform = 'translateY(-24px)';
+      toast.style.opacity = '0';
+    }, 4000);
+  }
+
+  function showInvalidCodeModal(invalidList) {
+    const modal = document.getElementById('invalidCodeModal');
+    const bg = document.getElementById('invalidCodeBg');
+    const content = document.getElementById('invalidCodeContent');
+    const listContainer = document.getElementById('invalidCodeList');
+    
+    listContainer.innerHTML = invalidList.map(c => `<span class="px-2.5 py-1 bg-white text-slate-600 border-2 border-slate-100 font-bold text-[13px] rounded-lg shadow-sm">${c}</span>`).join('');
+    
+    modal.classList.remove('pointer-events-none');
+    setTimeout(() => {
+      bg.classList.remove('opacity-0');
+      content.classList.remove('opacity-0', 'scale-95');
+    }, 10);
+  }
+
+  function closeInvalidCodeModal() {
+    const modal = document.getElementById('invalidCodeModal');
+    const bg = document.getElementById('invalidCodeBg');
+    const content = document.getElementById('invalidCodeContent');
+    
+    bg.classList.add('opacity-0');
+    content.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+      modal.classList.add('pointer-events-none');
+    }, 300);
+  }
+
+  document.getElementById('btnInvalidCodeOk').addEventListener('click', closeInvalidCodeModal);
+  document.getElementById('invalidCodeBg').addEventListener('click', closeInvalidCodeModal);
+
+  // ------------------------------------
+  // 導覽控制 (Stepper)
+  // ------------------------------------
+  const titles = ['1. 選擇商區', '2. 加入商品', '3. 確認送出', ''];
+  const viewContainer = document.getElementById('viewContainer');
+  const btnNavBack = document.getElementById('btnNavBack');
+  const btnMainAction = document.getElementById('btnMainAction');
+  const headerTitle = document.getElementById('headerTitle');
+  const headerProgress = document.getElementById('headerProgress');
+  const btnOpenScan = document.getElementById('btnOpenScan');
+  const mainHeader = document.getElementById('mainHeader');
+
+  function getSelectedLoc() {
+    if (isManualLoc) return document.getElementById('manualLocInput').value.trim().toUpperCase();
+    if (locType === 'TG') {
+      const d = document.getElementById('tgDept').value;
+      const n = document.getElementById('tgNum').value;
+      return (d && n) ? `${d}-${n}` : '';
+    } else {
+      return document.getElementById('boxNum').value;
+    }
+  }
+
+  function validateStep(step) {
+    if (step === 1) return getSelectedLoc() !== '';
+    if (step === 2) return modelCodes.length > 0;
+    return true; // 3 和 4 都不需要額外驗證
+  }
+
+  function renderView() {
+    // 因為 w-[400%]，每次移動 25% (1/4)
+    viewContainer.style.transform = `translateX(-${(currentStep - 1) * 25}%)`;
+    
+    if (currentStep < 4) {
+      mainHeader.style.display = 'flex';
+      setTimeout(() => mainHeader.style.opacity = '1', 10);
+      headerTitle.innerText = titles[currentStep - 1];
+      headerProgress.style.width = `${(currentStep / 3) * 100}%`;
+    } else {
+      // 進入第四步隱藏頂部 Header
+      mainHeader.style.opacity = '0';
+      setTimeout(() => mainHeader.style.display = 'none', 300);
     }
 
-    // 取得當前選擇的完整商區編號
-    function getSelectedLocation() {
-      // 若為手動模式，直接回傳輸入框的值
-      if (isManualLocationMode) {
-        return manualLocationInput.value.trim();
-      }
+    btnNavBack.style.visibility = (currentStep > 1 && currentStep < 4) ? 'visible' : 'hidden';
+    
+    if (currentStep === 2) {
+      btnOpenScan.style.display = 'flex';
+      btnMainAction.innerText = '完成，進入確認';
+    } else if (currentStep === 3) {
+      btnOpenScan.style.display = 'none';
+      btnMainAction.innerText = '確認並送出資料';
+    } else if (currentStep === 4) {
+      btnOpenScan.style.display = 'none';
+      btnMainAction.innerText = '完成並返回首頁';
+    } else {
+      btnOpenScan.style.display = 'none';
+      btnMainAction.innerText = '下一步';
+    }
 
-      const type = locTypeSelect.value;
+    if (currentStep === 3) renderConfirmView();
+    if (currentStep === 4) {
+      document.getElementById('successLocText').innerText = getSelectedLoc();
+      // 重置打勾動畫
+      const checkSvg = document.querySelector('.animate-draw-check');
+      checkSvg.style.animation = 'none';
+      checkSvg.offsetHeight; /* trigger reflow */
+      checkSvg.style.animation = null; 
+    }
+    
+    updateMainBtnState();
+  }
+
+  function updateMainBtnState() {
+    btnMainAction.disabled = !validateStep(currentStep);
+  }
+
+  btnMainAction.addEventListener('click', () => {
+    if (!validateStep(currentStep)) return;
+    
+    if (currentStep === 3) {
+      submitForm(); // 第三步點擊送出
+    } else if (currentStep === 4) {
+      resetAll(); // 第四步點擊返回首頁
+    } else {
+      currentStep++;
+      renderView();
+    }
+  });
+
+  btnNavBack.addEventListener('click', () => {
+    if (currentStep > 1 && currentStep < 4) { currentStep--; renderView(); }
+  });
+
+  // ------------------------------------
+  // Step 1: 商區邏輯 & 自動查詢
+  // ------------------------------------
+  const locTypeBg = document.getElementById('locTypeBg');
+  const tgSelects = document.getElementById('tgSelects');
+  const boxSelects = document.getElementById('boxSelects');
+  const locTabBtns = document.querySelectorAll('.loc-tab-btn');
+
+  locTabBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const type = e.target.dataset.type;
+      locType = type;
       if (type === 'TG') {
-        const dept = tgDeptSelect.value;
-        const num = tgNumSelect.value;
-        if (dept && num) return `${dept}-${num}`;
-      } else if (type === 'Box') {
-        const box = boxNumSelect.value;
-        if (box) return box;
-      }
-      return '';
-    }
-
-    // 檢查並切換送出按鈕的樣式與狀態
-    function checkSubmitButtonState() {
-      const isLocFilled = getSelectedLocation() !== '';
-      const hasModels = modelCodes.length > 0;
-      const isDisabled = isSubmitting || !hasModels || !isLocFilled;
-
-      submitBtn.disabled = isDisabled;
-
-      if (isDisabled) {
-        submitBtn.className = "w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all duration-200 bg-gray-200 text-gray-400 cursor-not-allowed";
+        locTypeBg.style.left = '4px';
+        locTabBtns[0].classList.replace('text-slate-500', 'text-white');
+        locTabBtns[1].classList.replace('text-white', 'text-slate-500');
+        tgSelects.style.display = 'flex';
+        boxSelects.style.display = 'none';
       } else {
-        submitBtn.className = "w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all duration-200 bg-[#3643ba] text-white hover:bg-blue-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5";
+        locTypeBg.style.left = 'calc(50% + 2px)';
+        locTabBtns[1].classList.replace('text-slate-500', 'text-white');
+        locTabBtns[0].classList.replace('text-white', 'text-slate-500');
+        tgSelects.style.display = 'none';
+        boxSelects.style.display = 'block';
       }
-    }
+      onLocChange();
+    });
+  });
 
-    // ==========================================
-    // 📷 相機掃描器相關邏輯
-    // ==========================================
-    function openScannerModal() {
-      if (typeof Html5Qrcode === "undefined") {
-        showMessage('error', '相機模組仍在載入中，請稍後再試。');
-        return;
+  function bindLocEvents() {
+    ['tgDept', 'tgNum', 'boxNum', 'manualLocInput'].forEach(id => {
+      document.getElementById(id).addEventListener('input', onLocChange);
+    });
+    document.getElementById('tgDept').addEventListener('change', e => {
+      const nums = locConfig.TG[e.target.value] || [];
+      document.getElementById('tgNum').innerHTML = '<option value="">選擇編號</option>' + nums.map(n => `<option value="${n}">${n}</option>`).join('');
+      onLocChange();
+    });
+  }
+
+  let fetchTimer = null; 
+  function onLocChange() {
+    updateMainBtnState();
+    const loc = getSelectedLoc();
+    const btnLoad = document.getElementById('btnLoadSnapshot');
+    const view = document.getElementById('snapshotView');
+
+    btnLoad.disabled = !loc; 
+
+    if (loc) {
+      if (loc !== snapshotForLoc) {
+        view.style.display = 'none';
+        previousSnapshot = null;
+        
+        clearTimeout(fetchTimer);
+        fetchTimer = setTimeout(() => {
+          fetchSnapshot(loc);
+        }, 500);
       }
-      scanStatusText.innerText = "請將相機對準商品條碼或 QR Code";
-      scannerModal.classList.remove('d-none');
-      
-      // 稍微延遲以確保 Modal 中的 DOM 渲染完畢
-      setTimeout(startScanning, 150);
+    } else {
+      view.style.display = 'none';
+      previousSnapshot = null;
+      snapshotForLoc = null;
+      clearTimeout(fetchTimer);
     }
+  }
 
-    async function startScanning() {
-      try {
-        if (!html5QrCodeScanner) {
-          html5QrCodeScanner = new Html5Qrcode("qr-reader");
+  async function fetchCsv(url) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error();
+      const txt = await res.text();
+      if (txt.toLowerCase().includes('<!doctype html>')) throw new Error('Auth');
+      return txt;
+    } catch {
+      const pRes = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+      return await pRes.text();
+    }
+  }
+
+  async function fetchConfig() {
+    const ds = document.getElementById('dataSourceStatus');
+    try {
+      const txt = await fetchCsv(GOOGLE_SHEET_CSV_URL.replace('/pubhtml', '/pub') + '&output=csv');
+      const rows = txt.split('\n').map(r => r.trim().split(','));
+      let newCfg = { TG: {}, Box: [] };
+      for (let i = 1; i < rows.length; i++) {
+        if (!rows[i][0]) continue;
+        const type = rows[i][0].replace(/['"]/g,'').toUpperCase();
+        const d = (rows[i][1]||'').replace(/['"]/g,'');
+        const n = (rows[i][2]||'').replace(/['"]/g,'');
+        if (type === 'TG' && d && n) {
+          if (!newCfg.TG[d]) newCfg.TG[d] = [];
+          newCfg.TG[d].push(n);
+        } else if (type === 'BOX' && n) {
+          newCfg.Box.push(n);
         }
-        isStartingScanner = true;
-
-        await html5QrCodeScanner.start(
-          { facingMode: "environment" }, // 優先使用手機後置鏡頭
-          { fps: 10, qrbox: { width: 250, height: 250 } },
-          (decodedText) => {
-            // 使用 Regex 擷取網址裡的 6~8 碼數字 (Model Code)
-            const match = decodedText.match(/\d{6,8}/);
-            if (match) {
-              const modelCode = match[0];
-              if (!modelCodes.includes(modelCode)) {
-                modelCodes.push(modelCode);
-                updateUI();
-              }
-              scanStatusText.innerText = `成功加入貨號: ${modelCode}`;
-              // 抓到後自動關閉掃描視窗
-              stopAndCloseScanner();
-            } else {
-              // 掃描到東西但不是我們要的貨號格式
-              scanStatusText.innerText = `無法辨識貨號，目前掃描到: ${decodedText.substring(0, 15)}...`;
-            }
-          },
-          (ignoreError) => {
-            // 忽略掃描過程中的背景錯誤
-          }
-        );
-        isStartingScanner = false;
-      } catch (err) {
-        console.error("相機啟動失敗", err);
-        isStartingScanner = false;
-        showMessage('error', '無法啟動相機！請確認已允許瀏覽器使用相機權限。');
-        scannerModal.classList.add('d-none');
       }
+      if (Object.keys(newCfg.TG).length > 0) {
+        locConfig = newCfg;
+        ds.innerHTML = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> <span class="text-green-600">商區清單已更新</span>`;
+      } else throw new Error();
+    } catch (e) {
+      isManualLoc = true;
+      ds.innerHTML = `<svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> <span class="text-amber-600">連線失敗，已切換手動輸入</span>`;
+      document.getElementById('standardLocGroup').style.display = 'none';
+      document.getElementById('manualLocGroup').style.display = 'block';
     }
+    
+    if (!isManualLoc) {
+      document.getElementById('tgDept').innerHTML = '<option value="">選擇部門</option>' + Object.keys(locConfig.TG).map(k => `<option value="${k}">${k}</option>`).join('');
+      document.getElementById('boxNum').innerHTML = '<option value="">選擇 Box 編號</option>' + locConfig.Box.map(k => `<option value="${k}">${k}</option>`).join('');
+    }
+    bindLocEvents();
+  }
 
-    async function stopAndCloseScanner() {
-      // 如果相機還在「啟動中」的狀態，延遲一下再關閉，避免 library 崩潰
-      if (isStartingScanner) {
-        setTimeout(stopAndCloseScanner, 300);
-        return;
-      }
+  async function fetchSnapshot(loc) {
+    if (!loc || isFetchingSnapshot) return;
+    
+    isFetchingSnapshot = true;
+    const btn = document.getElementById('btnLoadSnapshot');
+    const icon = btn.querySelector('svg');
+    const view = document.getElementById('snapshotView');
+    
+    icon.classList.add('animate-spin');
+    btn.disabled = true;
+    
+    view.style.display = 'block';
+    view.innerHTML = '<div class="text-center text-sm font-bold text-slate-400 py-4">查詢中...</div>';
 
-      if (html5QrCodeScanner) {
-        try {
-          await html5QrCodeScanner.stop();
-          html5QrCodeScanner.clear();
-        } catch (e) {
-          console.error("相機停止失敗", e);
+    try {
+      const txt = await fetchCsv(GOOGLE_RESPONSES_CSV_URL);
+      const rows = txt.split('\n').map(r => r.trim().split(','));
+      let match = null;
+      for (let i = 1; i < rows.length; i++) {
+        if (!rows[i] || rows[i].length < 3) continue;
+        if ((rows[i][1]||'').replace(/\s/g,'').toUpperCase() === loc.replace(/\s/g,'')) {
+          match = { time: rows[i][0], items: (rows[i][2]||'').split(/\s+/).filter(Boolean) };
         }
       }
-      scannerModal.classList.add('d-none');
+      previousSnapshot = match;
+      snapshotForLoc = loc;
+      renderSnapshotUI(match);
+    } catch {
+      view.innerHTML = `<div class="bg-red-50 text-red-500 font-bold text-sm p-3 rounded-xl border border-red-100">讀取失敗，請檢查網路。</div>`;
+    } finally {
+      icon.classList.remove('animate-spin');
+      btn.disabled = false;
+      isFetchingSnapshot = false;
     }
+  }
 
-    // 綁定掃描按鈕事件
-    btnScan.addEventListener('click', openScannerModal);
-    btnCloseScanner.addEventListener('click', stopAndCloseScanner);
+  document.getElementById('btnLoadSnapshot').addEventListener('click', () => {
+    fetchSnapshot(getSelectedLoc());
+  });
 
-    // ==========================================
-    // 處理批量新增與手動輸入
-    // ==========================================
-    function handleAddModels() {
-      const val = bulkInput.value;
-      if (!val.trim()) return;
+  function renderSnapshotUI(match) {
+    const v = document.getElementById('snapshotView');
+    if (!match) {
+      v.innerHTML = `<div class="bg-slate-50 text-slate-500 font-bold text-[13px] p-4 rounded-xl border-2 border-slate-100 flex gap-2"><svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>查無紀錄，這可能是第一次填寫。</div>`;
+      return;
+    }
+    
+    let html = `
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-[12px] font-bold text-slate-400">更新於 ${match.time.split(' ')[0]}</span>
+        <span class="text-[12px] font-extrabold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">共 ${match.items.length} 件</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1 no-scrollbar">
+    `;
+    html += match.items.map(code => `
+      <div class="flex items-center bg-white rounded-xl border-2 border-slate-100 p-1.5 gap-2 shadow-sm">
+        <div class="w-12 h-12 shrink-0 rounded-lg border border-slate-100 overflow-hidden bg-white">
+          <img src="https://product-picture.decathlon.cn/model/${code}.jpg?f=200" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
+        </div>
+        <div class="flex-1 font-bold text-slate-700 text-[14px] tracking-tighter truncate">${code}</div>
+      </div>
+    `).join('');
+    html += `</div>`;
+    v.innerHTML = html;
+  }
 
-      const cleanedInput = val.replace(/[,，。;；\n]/g, ' ');
-      const newCodes = cleanedInput.split(/\s+/).filter(code => code.trim() !== '');
-
-      const uniqueInputCodes = [...new Set(newCodes)];
-      const finalCodesToAdd = uniqueInputCodes.filter(code => !modelCodes.includes(code));
-      
-      if (finalCodesToAdd.length > 0) {
-        modelCodes = [...modelCodes, ...finalCodesToAdd];
-        updateUI();
+  // ------------------------------------
+  // Step 2: 商品邏輯 (加入與驗證)
+  // ------------------------------------
+  
+  function handleAddingCodes(rawCodes, isFromScanner = false) {
+    const valid = [];
+    const invalid = [];
+    
+    rawCodes.forEach(c => {
+      if (c.startsWith('8') || c.startsWith('9')) valid.push(c);
+      else invalid.push(c);
+    });
+    
+    const uniqueValid = [...new Set(valid)];
+    const toAdd = uniqueValid.filter(c => !modelCodes.includes(c));
+    
+    if (toAdd.length > 0) {
+      modelCodes = [...modelCodes, ...toAdd];
+      updateItemsGrid();
+    }
+    
+    if (invalid.length > 0) {
+      const uniqueInvalid = [...new Set(invalid)];
+      showInvalidCodeModal(uniqueInvalid);
+      if (isFromScanner) closeScanSheet();
+    } 
+    else {
+      if (isFromScanner && toAdd.length > 0) {
+        scanStatusMsg.innerText = `成功加入: ${toAdd[0]}`;
+        scanStatusMsg.className = 'text-center font-bold text-[13px] text-green-500 mt-4 mb-4';
+        setTimeout(closeScanSheet, 800);
+      } else if (isFromScanner && toAdd.length === 0 && valid.length > 0) {
+         scanStatusMsg.innerText = `已存在清單中: ${valid[0]}`;
+         scanStatusMsg.className = 'text-center font-bold text-[13px] text-amber-500 mt-4 mb-4';
+      } else if (!isFromScanner && toAdd.length === 0 && valid.length > 0) {
+         showToast('error', '清單中已存在此貨號');
+      } else if (!isFromScanner && toAdd.length > 0) {
+         showToast('check', `成功加入 ${toAdd.length} 件商品`);
       }
-      
-      bulkInput.value = '';
+    }
+  }
+
+  function updateItemsGrid() {
+    const grid = document.getElementById('itemsGrid');
+    document.getElementById('itemCountBadge').innerText = `${modelCodes.length} 件`;
+    
+    if (modelCodes.length === 0) {
+      grid.innerHTML = `
+        <div class="py-12 flex flex-col items-center justify-center bg-white border-2 border-dashed border-slate-200 rounded-2xl text-slate-400">
+          <svg class="w-10 h-10 mb-3 opacity-30" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          <p class="text-[13px] font-bold">尚未加入任何商品</p>
+        </div>`;
+    } else {
+      grid.innerHTML = modelCodes.map(code => `
+        <div class="flex items-center bg-white rounded-xl border-2 border-slate-100 p-2 gap-3 shadow-sm relative animate-[fadeIn_0.2s_ease-out]">
+          <div class="w-16 h-16 shrink-0 rounded-lg border-2 border-slate-50 overflow-hidden bg-white">
+            <img src="https://product-picture.decathlon.cn/model/${code}.jpg?f=400" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
+          </div>
+          <div class="flex-1 font-extrabold text-slate-700 text-[16px] tracking-wider">${code}</div>
+          <button onclick="removeItem('${code}')" class="w-10 h-10 shrink-0 bg-red-50 rounded-full flex items-center justify-center text-red-500 active:bg-red-100 mr-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+      `).join('');
+    }
+    updateMainBtnState();
+  }
+
+  window.removeItem = function(code) {
+    modelCodes = modelCodes.filter(c => c !== code);
+    updateItemsGrid();
+  };
+
+  document.getElementById('btnAdd').addEventListener('click', () => {
+    const input = document.getElementById('bulkInput');
+    const val = input.value.replace(/[,，。;；\n]/g, ' ');
+    const newCodes = val.split(/\s+/).filter(c => c.trim() !== '' && /^\d+$/.test(c));
+    
+    if (newCodes.length > 0) {
+      handleAddingCodes(newCodes, false);
+      input.value = '';
+    } else if (val.trim()) {
+      showToast('error', '請輸入有效的純數字號碼');
+    }
+  });
+
+  // ------------------------------------
+  // 掃描器 (Bottom Sheet)
+  // ------------------------------------
+  let html5QrCode = null;
+  const scanSheet = document.getElementById('scanSheet');
+  const scanBg = document.getElementById('scanBg');
+  const scanContent = document.getElementById('scanContent');
+  const scanStatusMsg = document.getElementById('scanStatusMsg');
+
+  function openScanSheet() {
+    scanSheet.classList.remove('pointer-events-none');
+    setTimeout(() => {
+      scanBg.classList.remove('opacity-0');
+      scanContent.classList.remove('translate-y-full');
+    }, 10);
+    startScanner();
+  }
+  function closeScanSheet() {
+    scanBg.classList.add('opacity-0');
+    scanContent.classList.add('translate-y-full');
+    setTimeout(() => {
+      scanSheet.classList.add('pointer-events-none');
+      if (html5QrCode) {
+        html5QrCode.stop().catch(()=>{});
+      }
+    }, 300);
+  }
+  document.getElementById('btnOpenScan').addEventListener('click', openScanSheet);
+  document.getElementById('btnCloseScan').addEventListener('click', closeScanSheet);
+  scanBg.addEventListener('click', closeScanSheet);
+
+  function startScanner() {
+    if (!html5QrCode) html5QrCode = new Html5Qrcode('qr-reader');
+    scanStatusMsg.innerText = '請對準 QR Code';
+    scanStatusMsg.className = 'text-center font-bold text-[13px] text-slate-500 mt-4 mb-4';
+
+    html5QrCode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: 220, aspectRatio: 1.0 },
+      (text) => {
+        const m = text.match(/\d{6,8}/);
+        if (m) {
+          handleAddingCodes([m[0]], true);
+        }
+      },
+      () => {}
+    ).catch(() => {
+      scanStatusMsg.innerText = '無法啟動相機，請嘗試下方的圖片上傳功能';
+      scanStatusMsg.className = 'text-center font-bold text-[13px] text-amber-500 mt-4 mb-4';
+    });
+  }
+
+  document.getElementById('fileQrInput').addEventListener('change', e => {
+    if (e.target.files.length === 0) return;
+    if (!html5QrCode) html5QrCode = new Html5Qrcode('qr-reader');
+    scanStatusMsg.innerText = '圖片解析中...';
+    
+    html5QrCode.scanFile(e.target.files[0], true)
+      .then(text => {
+        const m = text.match(/\d{6,8}/);
+        if (m) {
+          handleAddingCodes([m[0]], true);
+        } else throw new Error();
+      })
+      .catch(() => {
+        scanStatusMsg.innerText = '無法從圖片中辨識到 QR Code';
+        scanStatusMsg.className = 'text-center font-bold text-[13px] text-red-500 mt-4 mb-4';
+      });
+  });
+
+  // ------------------------------------
+  // Step 3: 確認與送出 (新增、移除、保留)
+  // ------------------------------------
+  function renderConfirmView() {
+    document.getElementById('confirmLocText').innerText = getSelectedLoc();
+    document.getElementById('finalTextarea').value = modelCodes.join(' ');
+    
+    const v = document.getElementById('diffView');
+    
+    if (!previousSnapshot) {
+      v.innerHTML = `<div class="bg-amber-50 text-amber-600 font-bold text-[13px] p-4 rounded-xl border-2 border-amber-100 flex items-start gap-2 shadow-sm"><svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>未查詢前次紀錄，將直接覆蓋。</div>`;
+      return;
     }
 
-    // 全域刪除方法
-    window.handleDelete = function(codeToRemove) {
-      modelCodes = modelCodes.filter(code => code !== codeToRemove);
-      updateUI();
+    const added = modelCodes.filter(c => !previousSnapshot.items.includes(c));
+    const removed = previousSnapshot.items.filter(c => !modelCodes.includes(c));
+    const retained = modelCodes.filter(c => previousSnapshot.items.includes(c));
+
+    let html = `<div class="text-[14px] font-extrabold text-slate-700 mb-4 flex items-center gap-2"><svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>差異比對</div>`;
+    
+    if (added.length === 0 && removed.length === 0 && retained.length === 0) {
+      html += `<div class="bg-slate-50 text-slate-500 font-bold text-[13px] p-4 rounded-xl border-2 border-slate-100 flex items-center gap-2 shadow-sm">目前沒有任何商品</div>`;
+      v.innerHTML = html;
+      return;
+    }
+
+    if (added.length === 0 && removed.length === 0) {
+      html += `<div class="mb-4 bg-slate-50 text-slate-500 font-bold text-[13px] p-3 rounded-xl border-2 border-slate-100 flex items-center gap-2 shadow-sm"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>與前次紀錄完全相同。</div>`;
+    }
+    
+    const renderMiniTag = (code, type) => {
+      let color = '';
+      if (type === 'add') color = 'text-green-700 bg-green-100 border-green-200';
+      else if (type === 'remove') color = 'text-red-700 bg-red-50 border-red-100 line-through';
+      else if (type === 'retain') color = 'text-slate-600 bg-slate-50 border-slate-200'; 
+
+      return `
+        <div class="flex items-center gap-2 p-1.5 pr-3 rounded-lg border-2 ${color} bg-white shadow-sm">
+          <div class="w-7 h-7 rounded bg-white overflow-hidden shrink-0 border border-slate-100">
+            <img src="https://product-picture.decathlon.cn/model/${code}.jpg?f=200" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
+          </div>
+          <span class="font-bold text-[14px]">${code}</span>
+        </div>`;
     };
 
-    // 事件監聽綁定
-    btnAdd.addEventListener('click', handleAddModels);
+    if (added.length) {
+      html += `
+        <div class="mb-4 bg-white p-4 rounded-xl border-2 border-green-100 shadow-sm">
+          <div class="flex items-center gap-2 text-green-600 font-extrabold text-[13px] mb-3">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            新增 ${added.length} 件
+          </div>
+          <div class="flex flex-wrap gap-2">${added.map(c => renderMiniTag(c, 'add')).join('')}</div>
+        </div>`;
+    }
 
-    bulkInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        handleAddModels();
-      }
-    });
+    if (removed.length) {
+      html += `
+        <div class="mb-4 bg-white p-4 rounded-xl border-2 border-red-100 shadow-sm">
+          <div class="flex items-center gap-2 text-red-500 font-extrabold text-[13px] mb-3">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            移除 ${removed.length} 件
+          </div>
+          <div class="flex flex-wrap gap-2">${removed.map(c => renderMiniTag(c, 'remove')).join('')}</div>
+        </div>`;
+    }
 
-    locTypeSelect.addEventListener('change', function(e) {
-      const val = e.target.value;
-      tgSelects.classList.add('d-none');
-      boxSelects.classList.add('d-none');
-      
-      if (val === 'TG') tgSelects.classList.remove('d-none');
-      if (val === 'Box') boxSelects.classList.remove('d-none');
-      
-      checkSubmitButtonState();
-    });
+    if (retained.length) {
+      html += `
+        <div class="mb-4 bg-white p-4 rounded-xl border-2 border-slate-200 shadow-sm">
+          <div class="flex items-center gap-2 text-slate-500 font-extrabold text-[13px] mb-3">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            保留 ${retained.length} 件
+          </div>
+          <div class="flex flex-wrap gap-2">${retained.map(c => renderMiniTag(c, 'retain')).join('')}</div>
+        </div>`;
+    }
 
-    tgDeptSelect.addEventListener('change', function(e) {
-      const dept = e.target.value;
-      tgNumSelect.innerHTML = '<option value="">選擇編號</option>';
-      if (dept && locationConfig.TG[dept]) {
-        locationConfig.TG[dept].forEach(num => {
-          tgNumSelect.innerHTML += `<option value="${num}">${num}</option>`;
-        });
-      }
-      checkSubmitButtonState();
-    });
+    v.innerHTML = html;
+  }
 
-    tgNumSelect.addEventListener('change', checkSubmitButtonState);
-    boxNumSelect.addEventListener('change', checkSubmitButtonState);
+  function submitForm() {
+    btnMainAction.disabled = true;
+    btnMainAction.innerText = '傳送中...';
     
-    // 新增：手動輸入框的事件監聽
-    manualLocationInput.addEventListener('input', checkSubmitButtonState);
+    if (!GOOGLE_FORM_URL) {
+      setTimeout(() => {
+        showToast('check', '測試：傳送成功');
+        currentStep = 4; // 進入完成畫面
+        renderView();
+      }, 1000);
+      return;
+    }
 
-    mainForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const finalLocation = getSelectedLocation();
-      if (!finalLocation) {
-        showMessage('error', '請完整選擇區域與編號！');
-        return;
-      }
+    const fd = new URLSearchParams();
+    fd.append(ENTRY_LOCATION, getSelectedLoc());
+    fd.append(ENTRY_MODELS, modelCodes.join(' '));
 
-      isSubmitting = true;
-      checkSubmitButtonState();
-      submitBtnText.innerText = '處理中...';
-
-      if (!GOOGLE_FORM_URL) {
-        setTimeout(() => {
-          isSubmitting = false;
-          checkSubmitButtonState();
-          submitBtnText.innerText = '確認無誤，送出資料';
-          showMessage('success', `【模擬測試】資料已準備送出！(區域: ${finalLocation})`);
-        }, 1000);
-        return;
-      }
-
-      // --- 實際送出資料到 Google 表單 ---
-      const formData = new URLSearchParams();
-      formData.append(ENTRY_LOCATION, finalLocation);
-      formData.append(ENTRY_MODELS, modelCodes.join(' '));
-
-      fetch(GOOGLE_FORM_URL, {
-        method: 'POST',
-        mode: 'no-cors', 
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData.toString()
-      }).then(() => {
-        isSubmitting = false;
-        checkSubmitButtonState();
-        submitBtnText.innerText = '確認無誤，送出資料';
-        
-        modelCodes = [];
-        updateUI();
-        
-        showMessage('success', '資料已成功送出至系統！');
-      }).catch((error) => {
-        isSubmitting = false;
-        checkSubmitButtonState();
-        submitBtnText.innerText = '確認無誤，送出資料';
-        
-        showMessage('error', '傳送失敗，請檢查網路連線或表單設定。');
-        console.error("Form Submit Error:", error);
-      });
+    fetch(GOOGLE_FORM_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: fd.toString()
+    }).then(() => {
+      // 成功後直接滑到第四步完成畫面
+      currentStep = 4; 
+      renderView();
+    }).catch(() => {
+      btnMainAction.disabled = false;
+      btnMainAction.innerText = '確認並送出資料';
+      showToast('error', '傳送失敗');
     });
+  }
 
-    // --- 初始化選單與讀取 Google Sheet ---
-    function initDropdowns() {
-      tgDeptSelect.innerHTML = '<option value="">選擇部門</option>';
-      Object.keys(locationConfig.TG).forEach(dept => {
-        tgDeptSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
-      });
-
-      boxNumSelect.innerHTML = '<option value="">選擇 Box 編號</option>';
-      locationConfig.Box.forEach(box => {
-        boxNumSelect.innerHTML += `<option value="${box}">${box}</option>`;
-      });
+  function resetAll() {
+    modelCodes = [];
+    previousSnapshot = null;
+    snapshotForLoc = null;
+    
+    document.getElementById('snapshotView').style.display = 'none';
+    
+    // 清空選擇的商區
+    if(!isManualLoc) {
+        document.getElementById('tgDept').value = '';
+        document.getElementById('tgNum').innerHTML = '<option value="">選擇編號</option>';
+        document.getElementById('boxNum').value = '';
+    } else {
+        document.getElementById('manualLocInput').value = '';
     }
+    
+    currentStep = 1;
+    renderView();
+    updateItemsGrid();
+    onLocChange(); // 重新觸發狀態驗證，讓下一步按鈕鎖死
+  }
 
-    async function loadConfig() {
-      if (!GOOGLE_SHEET_CSV_URL) {
-        initDropdowns();
-        return;
-      }
-      
-      dataSourceStatus.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>正在同步後台資料...`;
-      dataSourceStatus.className = "text-xs mt-3 flex items-center gap-1 text-blue-500 font-bold";
-      lucide.createIcons();
-      
-      try {
-        let fetchUrl = GOOGLE_SHEET_CSV_URL;
-        if (fetchUrl.includes('/pubhtml')) {
-            fetchUrl = fetchUrl.replace('/pubhtml', '/pub');
-            fetchUrl += fetchUrl.includes('?') ? '&output=csv' : '?output=csv';
-        }
-
-        let csvText = '';
-
-        try {
-            const res = await fetch(fetchUrl);
-            if (!res.ok) throw new Error("CORS or Server Error");
-            csvText = await res.text();
-        } catch (directError) {
-            console.warn("直接讀取被阻擋，嘗試使用 Proxy 代理伺服器...", directError);
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(fetchUrl)}`;
-            const proxyRes = await fetch(proxyUrl);
-            if (!proxyRes.ok) throw new Error("Proxy Fetch Failed");
-            csvText = await proxyRes.text();
-        }
-        
-        if (csvText.trim().toLowerCase().startsWith('<!doctype html>')) {
-            throw new Error("AUTH_ERROR");
-        }
-
-        const rows = csvText.split('\n').map(row => row.trim().split(','));
-        const newConfig = { TG: {}, Box: [] };
-        
-        for (let i = 1; i < rows.length; i++) {
-          if (!rows[i] || rows[i].length < 1) continue;
-          
-          const type = rows[i][0] ? rows[i][0].replace(/['"]/g, '') : '';
-          const dept = rows[i][1] ? rows[i][1].replace(/['"]/g, '') : '';
-          const num = rows[i][2] ? rows[i][2].replace(/['"]/g, '') : '';
-          
-          if (!type) continue;
-          
-          if (type.toUpperCase() === 'TG' && dept && num) {
-            if (!newConfig.TG[dept]) newConfig.TG[dept] = [];
-            newConfig.TG[dept].push(num);
-          } else if (type.toUpperCase() === 'BOX' && num) {
-            newConfig.Box.push(num);
-          }
-        }
-        
-        if (Object.keys(newConfig.TG).length > 0 || newConfig.Box.length > 0) {
-            locationConfig = newConfig;
-            dataSourceStatus.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i>已成功載入最新編號清單`;
-            dataSourceStatus.className = "text-xs mt-3 flex items-center gap-1 text-green-600 font-bold";
-        } else {
-            throw new Error("FORMAT_ERROR");
-        }
-      } catch (err) {
-        console.warn("載入失敗:", err.message);
-        
-        if (err.message === "AUTH_ERROR") {
-          dataSourceStatus.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i>讀取失敗：權限非公開，已自動切換為手動輸入`;
-        } else {
-          dataSourceStatus.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4"></i>網路異常或資料錯誤，已自動切換為手動輸入`;
-        }
-        
-        dataSourceStatus.className = "text-xs mt-3 flex items-center gap-1 text-red-500 font-bold";
-        
-        // --- 觸發手動輸入模式 ---
-        isManualLocationMode = true;
-        normalLocationContainer.classList.add('d-none');
-        manualLocationContainer.classList.remove('d-none');
-        checkSubmitButtonState();
-      }
-      
-      lucide.createIcons();
-      // 只有在非手動模式才需要初始化選單
-      if (!isManualLocationMode) {
-        initDropdowns();
-      }
-    }
-
-    // 初始渲染
-    updateUI();
-    loadConfig();
-  </script>
+  // Init
+  updateDots();
+</script>
+<style>
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 </body>
 </html>
+
+
