@@ -36,6 +36,8 @@
     background-color: #f8fafc;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: none;
+    /* 確保在 iOS 上拖曳滑塊時不會觸發上一頁手勢 */
+    touch-action: pan-y; 
   }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -125,7 +127,7 @@
         
         <div id="dataSourceStatus" class="flex items-center gap-2 text-xs font-bold text-slate-500 mb-6 bg-white border-2 border-slate-100 rounded-lg p-2.5 shadow-sm">
           <svg class="w-4 h-4 animate-spin text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-          正在同步後台商區資料...
+          正在更新商區資料...
         </div>
 
         <div id="standardLocGroup" class="space-y-4 mb-8">
@@ -192,7 +194,7 @@
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-extrabold text-slate-700 text-[15px] flex items-center gap-2">
             <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-            已加入清單
+            已加入清單（沒更動的商品也要加入）
           </h3>
           <span id="itemCountBadge" class="px-3 py-1 bg-primary/10 text-primary text-[12px] font-bold rounded-full">0 件</span>
         </div>
@@ -229,14 +231,13 @@
       <!-- === VIEW 4: 完成畫面 === -->
       <div class="w-1/4 h-full flex flex-col items-center justify-center p-6 bg-white">
         <div class="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center mb-6 relative">
-          <!-- 繪製打勾的 SVG 動畫 -->
           <svg class="w-12 h-12 text-green-500 animate-draw-check" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
             <path d="M5 13l4 4L19 7"></path>
           </svg>
         </div>
-        <h2 class="text-2xl font-extrabold text-slate-800 mb-2 tracking-tight">他被拯救了！</h2>
+        <h2 class="text-2xl font-extrabold text-slate-800 mb-2 tracking-tight">它被拯救了！</h2>
         <p class="text-[15px] font-bold text-slate-500 text-center mb-10 leading-relaxed">
-          <span id="successLocText" class="text-primary">-</span> 的商品資料<br>已成功同步至後台資料庫
+          <span id="successLocText" class="text-primary">-</span> 的商品資料<br>已成功同步至資料庫
         </p>
       </div>
 
@@ -248,12 +249,26 @@
     <button id="btnOpenScan" class="hidden h-14 bg-white border-2 border-primary text-primary rounded-xl font-bold text-[15px] items-center justify-center gap-2 active:bg-primary/5 transition-colors shadow-sm" style="flex: 0.8;">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
     </button>
+    
+    <!-- 一般按鈕 (用於第一、第二、第四步) -->
     <button id="btnMainAction" class="flex-1 h-14 bg-primary text-white rounded-xl font-bold text-[16px] shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-[0.98] active:bg-primaryDark transition-all disabled:opacity-50 disabled:shadow-none">下一步</button>
+    
+    <!-- 滑動解鎖按鈕容器 (專用於第三步送出) -->
+    <div id="slideConfirmContainer" class="hidden flex-1 h-14 bg-slate-100 rounded-xl relative overflow-hidden shadow-inner touch-none">
+      <!-- 滑動後填滿的背景色 -->
+      <div id="slideFill" class="absolute top-0 left-0 bottom-0 w-0 bg-primary transition-none"></div>
+      <!-- 提示文字 -->
+      <div id="slideText" class="absolute inset-0 flex items-center justify-center text-[15px] font-bold text-slate-500 z-10 pointer-events-none transition-colors duration-200">滑動以送出</div>
+      <!-- 可拖曳的滑塊 -->
+      <div id="slideThumb" class="absolute top-1 left-1 bottom-1 w-12 bg-white rounded-lg shadow-md flex items-center justify-center text-primary z-20 cursor-grab active:cursor-grabbing transition-transform">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+      </div>
+    </div>
   </div>
 
 </div>
 
-<!-- ============ 掃描 Bottom Sheet (平時以 hidden 隱藏防止擋住點擊) ============ -->
+<!-- ============ 掃描 Bottom Sheet ============ -->
 <div id="scanSheet" class="absolute inset-0 z-[60] hidden">
   <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" id="scanBg"></div>
   <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl transform translate-y-full transition-transform duration-300 pointer-events-auto flex flex-col max-h-[85vh]" id="scanContent">
@@ -280,7 +295,7 @@
   </div>
 </div>
 
-<!-- ============ 警告：Item Code 錯誤提示 Modal (平時以 hidden 隱藏) ============ -->
+<!-- ============ 警告：Item Code 錯誤提示 Modal ============ -->
 <div id="invalidCodeModal" class="absolute inset-0 z-[80] hidden items-center justify-center p-4">
   <div id="invalidCodeBg" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
   <div id="invalidCodeContent" class="relative bg-white rounded-[24px] shadow-2xl w-full max-w-[320px] transform scale-95 opacity-0 transition-all duration-300 flex flex-col overflow-hidden">
@@ -289,7 +304,7 @@
         <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
       </div>
       <h3 class="text-[17px] font-extrabold text-slate-800 mb-2">你可能輸入了 Item Code</h3>
-      <p class="text-[13px] font-bold text-slate-500 mb-4 leading-relaxed">請輸入 Model Code，以下貨號已排除：</p>
+      <p class="text-[13px] font-bold text-slate-500 mb-4 leading-relaxed">請檢查商品清單，以下貨號已被自動排除：</p>
       <div id="invalidCodeList" class="w-full max-h-[120px] overflow-y-auto bg-slate-50 border-2 border-slate-100 rounded-xl p-3 flex flex-wrap gap-2 justify-center no-scrollbar">
         <!-- 動態插入錯誤號碼 -->
       </div>
@@ -440,10 +455,11 @@
   // ------------------------------------
   // 導覽控制 (Stepper)
   // ------------------------------------
-  const titles = ['1. 選擇商區', '2. 加入商品', '3. 確認送出', ''];
+  const titles = ['1. 選擇商區', '2. 加入所有商品', '3. 確認送出', ''];
   const viewContainer = document.getElementById('viewContainer');
   const btnNavBack = document.getElementById('btnNavBack');
   const btnMainAction = document.getElementById('btnMainAction');
+  const slideConfirmContainer = document.getElementById('slideConfirmContainer');
   const headerTitle = document.getElementById('headerTitle');
   const headerProgress = document.getElementById('headerProgress');
   const btnOpenScan = document.getElementById('btnOpenScan');
@@ -481,18 +497,23 @@
 
     btnNavBack.style.visibility = (currentStep > 1 && currentStep < 4) ? 'visible' : 'hidden';
     
-    if (currentStep === 2) {
-      btnOpenScan.style.display = 'flex';
-      btnMainAction.innerText = '完成，進入確認';
-    } else if (currentStep === 3) {
-      btnOpenScan.style.display = 'none';
-      btnMainAction.innerText = '確認並送出資料';
-    } else if (currentStep === 4) {
-      btnOpenScan.style.display = 'none';
-      btnMainAction.innerText = '完成並返回首頁';
+    // 按鈕與掃描器的狀態切換
+    btnOpenScan.style.display = (currentStep === 2) ? 'flex' : 'none';
+    
+    // 切換普通按鈕與滑動解鎖按鈕的顯示
+    if (currentStep === 3) {
+      btnMainAction.classList.add('hidden');
+      slideConfirmContainer.classList.remove('hidden');
+      slideConfirmContainer.classList.add('flex');
+      resetSlider(); // 每次進入第三步都重置滑塊狀態
     } else {
-      btnOpenScan.style.display = 'none';
-      btnMainAction.innerText = '下一步';
+      slideConfirmContainer.classList.add('hidden');
+      slideConfirmContainer.classList.remove('flex');
+      btnMainAction.classList.remove('hidden');
+      
+      if (currentStep === 2) btnMainAction.innerText = '完成，進入確認';
+      else if (currentStep === 4) btnMainAction.innerText = '返回首頁';
+      else btnMainAction.innerText = '下一步';
     }
 
     if (currentStep === 3) renderConfirmView();
@@ -509,16 +530,21 @@
 
   function updateMainBtnState() {
     btnMainAction.disabled = !validateStep(currentStep);
+    // 如果在第三步且沒有驗證通過（雖然目前不需要，但防呆），滑動會被鎖死
+    if (currentStep === 3 && !validateStep(currentStep)) {
+        slideConfirmContainer.style.opacity = '0.5';
+        slideConfirmContainer.style.pointerEvents = 'none';
+    } else {
+        slideConfirmContainer.style.opacity = '1';
+        slideConfirmContainer.style.pointerEvents = 'auto';
+    }
   }
 
   btnMainAction.addEventListener('click', () => {
     if (!validateStep(currentStep)) return;
-    
-    if (currentStep === 3) {
-      submitForm();
-    } else if (currentStep === 4) {
+    if (currentStep === 4) {
       resetAll();
-    } else {
+    } else if (currentStep < 3) {
       currentStep++;
       renderView();
     }
@@ -527,6 +553,91 @@
   btnNavBack.addEventListener('click', () => {
     if (currentStep > 1 && currentStep < 4) { currentStep--; renderView(); }
   });
+
+  // ------------------------------------
+  // 滑動解鎖送出邏輯 (Slide to Confirm)
+  // ------------------------------------
+  const slideThumb = document.getElementById('slideThumb');
+  const slideFill = document.getElementById('slideFill');
+  const slideText = document.getElementById('slideText');
+  let isDragging = false;
+  let startX = 0;
+  let currentX = 0;
+  let maxSlide = 0;
+  let isSubmitted = false;
+
+  function resetSlider() {
+    isSubmitted = false;
+    slideThumb.style.transition = 'transform 0.3s ease';
+    slideFill.style.transition = 'width 0.3s ease';
+    slideThumb.style.transform = `translateX(0px)`;
+    slideFill.style.width = `0px`;
+    slideText.innerText = '去探險';
+    slideText.classList.remove('text-white');
+    slideText.classList.add('text-slate-500');
+    // 重新啟用滑塊
+    slideThumb.style.pointerEvents = 'auto';
+  }
+
+  function onSlideStart(e) {
+    if (isSubmitted || !validateStep(currentStep)) return;
+    isDragging = true;
+    startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    // 計算最大可滑動距離 (容器寬度 - 滑塊寬度 - 左右各 4px 的 padding)
+    maxSlide = slideConfirmContainer.offsetWidth - slideThumb.offsetWidth - 8;
+    
+    // 移除過場動畫讓拖曳跟手
+    slideThumb.style.transition = 'none';
+    slideFill.style.transition = 'none';
+    slideText.classList.remove('text-slate-500');
+    slideText.classList.add('text-white');
+  }
+
+  function onSlideMove(e) {
+    if (!isDragging || isSubmitted) return;
+    const x = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+    let diff = x - startX;
+    
+    // 限制滑動範圍
+    if (diff < 0) diff = 0;
+    if (diff > maxSlide) diff = maxSlide;
+    
+    currentX = diff;
+    slideThumb.style.transform = `translateX(${currentX}px)`;
+    slideFill.style.width = `${currentX + 24}px`; // 加上半徑讓顏色填滿圓角
+  }
+
+  function onSlideEnd() {
+    if (!isDragging || isSubmitted) return;
+    isDragging = false;
+    slideThumb.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    slideFill.style.transition = 'width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    
+    // 如果滑動超過 90%，則判定為送出成功
+    if (currentX > maxSlide * 0.9) {
+      isSubmitted = true;
+      // 鎖死在最右邊
+      slideThumb.style.transform = `translateX(${maxSlide}px)`;
+      slideFill.style.width = `100%`;
+      slideText.innerText = '探險中...';
+      slideThumb.style.pointerEvents = 'none';
+      
+      // 觸發實際送出行為
+      submitForm();
+    } else {
+      // 否則彈回原點
+      resetSlider();
+    }
+  }
+
+  // 綁定滑鼠與觸控事件
+  slideThumb.addEventListener('mousedown', onSlideStart);
+  document.addEventListener('mousemove', onSlideMove);
+  document.addEventListener('mouseup', onSlideEnd);
+  
+  slideThumb.addEventListener('touchstart', onSlideStart, { passive: true });
+  document.addEventListener('touchmove', onSlideMove, { passive: false });
+  document.addEventListener('touchend', onSlideEnd);
 
   // ------------------------------------
   // Step 1: 商區邏輯 & 自動查詢
@@ -628,7 +739,7 @@
       }
       if (Object.keys(newCfg.TG).length > 0) {
         locConfig = newCfg;
-        ds.innerHTML = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> <span class="text-green-600">商區清單已更新</span>`;
+        ds.innerHTML = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> <span class="text-green-600">商區資料已更新</span>`;
       } else throw new Error();
     } catch (e) {
       isManualLoc = true;
@@ -758,7 +869,7 @@
     
     if (modelCodes.length === 0) {
       grid.innerHTML = `
-        <div class="py-12 flex flex-col items-center justify-center bg-white border-2 border-dashed border-slate-200 rounded-2xl text-slate-400">
+        <div class="py-12 flex flex-col items-center justify-center bg-white border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-center">
           <svg class="w-10 h-10 mb-3 opacity-30" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           <p class="text-[13px] font-bold">尚未加入任何商品</p>
         </div>`;
@@ -797,7 +908,7 @@
   });
 
   // ------------------------------------
-  // 掃描器 (Bottom Sheet) 
+  // 掃描器 (Bottom Sheet)
   // ------------------------------------
   let html5QrCode = null;
   const scanSheet = document.getElementById('scanSheet');
@@ -834,10 +945,9 @@
     scanStatusMsg.innerText = '請對準 QR Code';
     scanStatusMsg.className = 'text-center font-bold text-[13px] text-slate-500 mt-4 mb-4';
 
-    // 移除 aspectRatio，並設定明確的寬高，讓 iOS 自由適應
     html5QrCode.start(
       { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 220, height: 220 } },
+      { fps: 10, qrbox: 220, aspectRatio: 1.0 },
       (text) => {
         const m = text.match(/\d{6,8}/);
         if (m) {
@@ -870,7 +980,7 @@
   });
 
   // ------------------------------------
-  // Step 3: 確認與送出 
+  // Step 3: 確認與送出 (新增、移除、保留)
   // ------------------------------------
   function renderConfirmView() {
     document.getElementById('confirmLocText').innerText = getSelectedLoc();
@@ -951,9 +1061,6 @@
   }
 
   function submitForm() {
-    btnMainAction.disabled = true;
-    btnMainAction.innerText = '傳送中...';
-    
     if (!GOOGLE_FORM_URL) {
       setTimeout(() => {
         showToast('check', '測試：傳送成功');
@@ -975,9 +1082,9 @@
       currentStep = 4; 
       renderView();
     }).catch(() => {
-      btnMainAction.disabled = false;
-      btnMainAction.innerText = '確認並送出資料';
-      showToast('error', '傳送失敗');
+      // 失敗時恢復滑塊狀態
+      resetSlider();
+      showToast('error', '傳送失敗，請重試');
     });
   }
 
