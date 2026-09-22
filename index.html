@@ -108,7 +108,9 @@
       <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
     </button>
     <h2 id="headerTitle" class="flex-1 text-center font-extrabold text-lg text-slate-800 tracking-tight">1. 選擇商區</h2>
-    <div class="w-10 h-10"></div>
+    <button id="btnOpenSales" class="w-10 h-10 rounded-full flex items-center justify-center active:bg-slate-100 transition-colors text-primary" title="查看商品業績">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+    </button>
     <div class="absolute bottom-0 left-0 h-1 bg-slate-100 w-full">
       <div id="headerProgress" class="h-full bg-primary transition-all duration-300 w-1/4 rounded-r-full"></div>
     </div>
@@ -166,14 +168,14 @@
         </div>
 
         <div id="manualLocGroup" class="hidden mb-8">
-          <input type="text" id="manualLocInput" placeholder="輸入商區 (例如: C1-3)" class="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold text-[15px] rounded-xl px-4 py-3.5 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-slate-400 shadow-sm">
+          <input type="text" id="manualLocInput" placeholder="輸入商區（例如：C1-3 或 B01）" class="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold text-[15px] rounded-xl px-4 py-3.5 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-slate-400 shadow-sm">
         </div>
 
         <div class="border-t-2 border-slate-100 pt-6">
           <div class="flex items-center justify-between mb-3">
             <h3 class="font-extrabold text-slate-700 text-[15px] flex items-center gap-2">
               <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-              目前現有商品紀錄
+              目前現有商品
             </h3>
             <button id="btnLoadSnapshot" disabled class="w-9 h-9 flex items-center justify-center rounded-full transition-colors text-primary bg-primary/10 active:bg-primary/20 disabled:opacity-50 disabled:bg-slate-100 disabled:text-slate-400">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -204,6 +206,18 @@
             <svg class="w-10 h-10 mb-3 opacity-30" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
             <p class="text-[13px] font-bold">尚未加入任何商品</p>
           </div>
+        </div>
+
+        <div id="existingQuickAddSection" class="hidden mt-8 pt-6 border-t-2 border-slate-100">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="font-extrabold text-slate-700 text-[15px] flex items-center gap-2">
+              <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+              目前現有商品
+            </h3>
+            <span id="existingQuickAddCount" class="px-3 py-1 bg-slate-100 text-slate-500 text-[12px] font-bold rounded-full">0 件</span>
+          </div>
+          <p class="text-[12px] font-bold text-slate-400 mb-3">沒更動的商品可直接點選加入，或於上方重新輸入貨號</p>
+          <div id="existingQuickAddGrid" class="grid grid-cols-2 gap-2"></div>
         </div>
       </div>
 
@@ -320,6 +334,52 @@
   </div>
 </div>
 
+<!-- ============ 商品業績查詢 Bottom Sheet ============ -->
+<div id="salesSheet" class="absolute inset-0 z-[75] hidden">
+  <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" id="salesBg"></div>
+  <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl transform translate-y-full transition-transform duration-300 pointer-events-auto flex flex-col max-h-[88vh]" id="salesContent">
+    <div class="flex justify-center pt-3 pb-2"><div class="w-12 h-1.5 bg-slate-200 rounded-full"></div></div>
+    <div class="px-5 pb-3 flex justify-between items-center border-b-2 border-slate-50">
+      <h3 class="font-extrabold text-[16px] text-slate-800 flex items-center gap-2">
+        <svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+        商品業績查詢
+      </h3>
+      <button id="btnCloseSales" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 active:bg-slate-200">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
+    <!-- 分頁切換：查詢 / 歷史清單 -->
+    <div class="px-5 pt-4">
+      <div class="flex bg-white p-1 rounded-xl shadow-sm border-2 border-slate-100 relative">
+        <div id="salesTabBg" class="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-primary rounded-lg transition-all duration-200"></div>
+        <button type="button" class="sales-tab-btn relative z-10 flex-1 py-2.5 text-[13px] font-bold text-white transition-colors" data-tab="query">查詢貨號</button>
+        <button type="button" class="sales-tab-btn relative z-10 flex-1 py-2.5 text-[13px] font-bold text-slate-500 transition-colors" data-tab="history">歷史清單</button>
+      </div>
+    </div>
+
+    <!-- 查詢分頁 -->
+    <div id="salesQueryPanel" class="px-5 pt-4 flex-1 overflow-y-auto pb-6">
+      <div class="flex gap-2 mb-4">
+        <input type="text" id="salesSearchInput" inputmode="numeric" placeholder="輸入 Model Code 查詢" class="flex-1 bg-white border-2 border-slate-200 text-slate-700 font-bold text-[14px] rounded-xl px-4 py-3 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all placeholder:text-[12.5px] placeholder:font-medium placeholder:text-slate-400 shadow-sm min-w-0">
+        <button id="btnSalesSearch" class="px-5 bg-primary text-white rounded-xl font-bold text-[14px] shadow-sm active:bg-primaryDark transition-colors shrink-0">查詢</button>
+      </div>
+      <div id="salesResultArea"></div>
+    </div>
+
+    <!-- 歷史清單分頁 -->
+    <div id="salesHistoryPanel" class="hidden px-5 pt-4 flex-1 overflow-y-auto pb-6">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] font-bold text-slate-400">曾放入 TG / Box 的商品，依最近更新時間排序</p>
+        <button id="btnRefreshHistory" class="w-8 h-8 flex items-center justify-center rounded-full text-primary bg-primary/10 active:bg-primary/20 disabled:opacity-50 shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        </button>
+      </div>
+      <div id="salesHistoryList"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ============ 掃描 Bottom Sheet (平時以 hidden 隱藏防止擋住點擊) ============ -->
 <div id="scanSheet" class="absolute inset-0 z-[60] hidden">
   <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300" id="scanBg"></div>
@@ -382,6 +442,35 @@
   const ENTRY_MODELS = "entry.1574742509";
   const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlW93nNOC2e79n_wXpyjoLlFqE3b59yajqBRUt1qGe36yFaG7ImEsL_Nu8uJkrdI3GUuKq9Q08cTTo/pub?gid=216640336&single=true&output=csv";
   const GOOGLE_RESPONSES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlW93nNOC2e79n_wXpyjoLlFqE3b59yajqBRUt1qGe36yFaG7ImEsL_Nu8uJkrdI3GUuKq9Q08cTTo/pub?gid=155045588&single=true&output=csv";
+  const GOOGLE_SALES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlW93nNOC2e79n_wXpyjoLlFqE3b59yajqBRUt1qGe36yFaG7ImEsL_Nu8uJkrdI3GUuKq9Q08cTTo/pub?gid=1058299531&single=true&output=csv";
+  // 業績報表欄位區塊順序：W-1(上週) / W-2(上上週) / W-3(上上上週) / 下四周(未來四週·大台北) / 上四周(過去四週)，每區塊 11 欄
+  const SALES_PERIODS = [
+    { key: 'w1',    label: 'W-1',            short: 'W-1' },
+    { key: 'w2',    label: 'W-2',            short: 'W-2' },
+    { key: 'w3',    label: 'W-3',            short: 'W-3' },
+    { key: 'next4', label: '未來四週（大台北）', short: '下四周' },
+    { key: 'past4', label: '過去四週',       short: '上四周' }
+  ];
+
+  // 依「今天」自動推算 W-1 / W-2 / W-3 各自對應到當年度的第幾週（ISO 週數），
+  // 並把結果組進 label，例如 "W-1（第38週）"
+  function getISOWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  }
+
+  function updateSalesPeriodLabels() {
+    const now = new Date();
+    [7, 14, 21].forEach((daysAgo, idx) => {
+      const d = new Date(now);
+      d.setDate(d.getDate() - daysAgo);
+      SALES_PERIODS[idx].label = `${SALES_PERIODS[idx].short}（第 ${getISOWeekNumber(d)} 週）`;
+    });
+  }
+  updateSalesPeriodLabels();
 
   const SVG_ICONS = {
     check: `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>`,
@@ -389,6 +478,17 @@
   };
 
   const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect><circle cx='8.5' cy='8.5' r='1.5'></circle><polyline points='21 15 16 10 5 21'></polyline></svg>`;
+
+  // 將 Google 表單時間戳記（例如 "4/27/2026 10:23:45"）統一轉成 YYYY/MM/DD 顯示
+  function formatDateYMD(str) {
+    if (!str) return '';
+    const d = new Date(str);
+    if (isNaN(d.getTime())) return str.split(' ')[0]; // 解析失敗時退回原始日期字串
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}/${m}/${day}`;
+  }
 
   let locConfig = { TG: { "C1": ["1","2","3"], "C2": ["1","2"] }, Box: ["B01","B02","B03"] };
   let isManualLoc = false;
@@ -600,6 +700,7 @@
     
     // 按鈕與掃描器的狀態切換
     btnOpenScan.style.display = (currentStep === 2) ? 'flex' : 'none';
+    if (currentStep === 2) renderExistingQuickAdd();
     
     // 切換普通按鈕與滑動解鎖按鈕的顯示
     if (currentStep === 3) {
@@ -805,6 +906,7 @@
       snapshotForLoc = null;
       clearTimeout(fetchTimer);
     }
+    renderExistingQuickAdd();
   }
 
   async function fetchCsv(url) {
@@ -883,6 +985,7 @@
       previousSnapshot = match;
       snapshotForLoc = loc;
       renderSnapshotUI(match);
+      renderExistingQuickAdd();
     } catch {
       view.innerHTML = `<div class="bg-red-50 text-red-500 font-bold text-sm p-3 rounded-xl border border-red-100">讀取失敗，請檢查網路。</div>`;
     } finally {
@@ -905,13 +1008,13 @@
     
     let html = `
       <div class="flex justify-between items-center mb-3">
-        <span class="text-[12px] font-bold text-slate-400">更新於 ${match.time.split(' ')[0]}</span>
+        <span class="text-[12px] font-bold text-slate-400">更新於 ${formatDateYMD(match.time)}</span>
         <span class="text-[12px] font-extrabold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">共 ${match.items.length} 件</span>
       </div>
       <div class="grid grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1 no-scrollbar">
     `;
     html += match.items.map(code => `
-      <div class="flex items-center bg-white rounded-xl border-2 border-slate-100 p-1.5 gap-2 shadow-sm">
+      <div onclick="openSalesSheet('${code}')" class="flex items-center bg-white rounded-xl border-2 border-slate-100 p-1.5 gap-2 shadow-sm cursor-pointer active:opacity-70">
         <div class="w-12 h-12 shrink-0 rounded-lg border border-slate-100 overflow-hidden bg-white">
           <img src="https://product-picture.decathlon.cn/model/${code}.jpg?f=200" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
         </div>
@@ -921,6 +1024,330 @@
     html += `</div>`;
     v.innerHTML = html;
   }
+
+  // ------------------------------------
+  // 商品業績查詢
+  // ------------------------------------
+
+  // 業績報表欄位較多且部分欄位（如 family）內含逗號並以雙引號包住，
+  // 需要用正規的 CSV 解析器（naive split(',') 在這份報表上會解析錯誤）
+  function parseCsvRobust(text) {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else { inQuotes = false; }
+        } else {
+          field += c;
+        }
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\r') { /* 忽略，交給 \n 換行 */ }
+        else if (c === '\n') { row.push(field); field = ''; rows.push(row); row = []; }
+        else field += c;
+      }
+    }
+    if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  let salesDataMap = null;       // { periodKey: Map(model_code -> record) }
+  let salesFetchPromise = null;  // 避免重複發起請求
+
+  function ensureSalesData() {
+    if (salesDataMap) return Promise.resolve(salesDataMap);
+    if (salesFetchPromise) return salesFetchPromise;
+
+    salesFetchPromise = fetchCsv(GOOGLE_SALES_CSV_URL).then(txt => {
+      const rows = parseCsvRobust(txt);
+      const map = {};
+      SALES_PERIODS.forEach(p => map[p.key] = new Map());
+
+      for (let r = 2; r < rows.length; r++) {
+        const row = rows[r];
+        if (!row || row.length < 55) continue;
+        for (let b = 0; b < 5; b++) {
+          const start = b * 11;
+          const code = (row[start + 2] || '').trim();
+          if (!code || code.toLowerCase() === 'unknown') continue;
+          const key = SALES_PERIODS[b].key;
+          if (map[key].has(code)) continue; // 同一區塊內重複列，保留第一筆即可
+          map[key].set(code, {
+            universe: row[start + 0] || '',
+            family:   row[start + 1] || '',
+            model_code: code,
+            label:    row[start + 3] || '',
+            price:    row[start + 4] || '',
+            category: row[start + 5] || '',
+            image:    row[start + 6] || '',
+            gmv:      row[start + 7] || '',
+            pctGmv:   row[start + 8] || '',
+            qty:      row[start + 9] || '',
+            pctQty:   row[start + 10] || ''
+          });
+        }
+      }
+      salesDataMap = map;
+      return map;
+    }).catch(err => {
+      salesFetchPromise = null; // 失敗時允許重新嘗試
+      throw err;
+    });
+
+    return salesFetchPromise;
+  }
+
+  function getSalesForCode(code) {
+    if (!salesDataMap) return null;
+    const result = {};
+    SALES_PERIODS.forEach(p => { result[p.key] = salesDataMap[p.key].get(code) || null; });
+    return result;
+  }
+
+  function formatSalesNum(v) {
+    if (v === undefined || v === null) return null;
+    const s = String(v).trim();
+    if (s === '' || s.toLowerCase() === 'null') return null;
+    const n = parseFloat(s);
+    if (isNaN(n)) return null;
+    return Math.round(n).toLocaleString('zh-TW');
+  }
+
+  const ICON_TREND_UP = `<svg class="w-2 h-2" viewBox="0 0 12 12" fill="currentColor"><path d="M6 2l5 8H1z"/></svg>`;
+  const ICON_TREND_DOWN = `<svg class="w-2 h-2" viewBox="0 0 12 12" fill="currentColor"><path d="M6 10L1 2h10z"/></svg>`;
+  const ICON_TREND_FLAT = `<svg class="w-2 h-2" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 6h10"/></svg>`;
+
+  function renderTrendBadge(pct) {
+    if (pct === undefined || pct === null || pct === '') return '';
+    const v = parseFloat(pct);
+    if (isNaN(v)) return '';
+    if (v === 0) return `<span class="inline-flex items-center gap-1 text-[11px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-400">${ICON_TREND_FLAT} 持平</span>`;
+    const isUp = v > 0;
+    const color = isUp ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50';
+    const icon = isUp ? ICON_TREND_UP : ICON_TREND_DOWN;
+    return `<span class="inline-flex items-center gap-1 text-[11px] font-extrabold px-1.5 py-0.5 rounded ${color}">${icon} ${Math.abs(v * 100).toFixed(1)}%</span>`;
+  }
+
+  function renderSalesResult(code) {
+    const area = document.getElementById('salesResultArea');
+    const data = getSalesForCode(code);
+    const info = data ? SALES_PERIODS.map(p => data[p.key]).find(Boolean) : null;
+
+    if (!info) {
+      area.innerHTML = `<div class="bg-amber-50 text-amber-600 font-bold text-[13px] p-4 rounded-xl border-2 border-amber-100 flex items-start gap-2 shadow-sm"><svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>查無貨號 ${code} 的業績紀錄，可能是紀錄過期或尚未更新。</div>`;
+      return;
+    }
+
+    let html = `
+      <div class="flex items-center gap-3 bg-white border-2 border-slate-100 rounded-2xl p-3 mb-4 shadow-sm">
+        <div class="w-16 h-16 shrink-0 rounded-xl overflow-hidden border border-slate-100 bg-white">
+          <img src="https://product-picture.decathlon.cn/model/${code}.jpg?f=200" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-extrabold text-slate-800 text-[14px] leading-tight line-clamp-2">${info.label || code}</div>
+          <div class="text-slate-400 text-[12px] font-bold mt-1">${code}${info.price ? ' · NT$' + info.price : ''}</div>
+        </div>
+      </div>
+      <div class="space-y-2.5">`;
+
+    SALES_PERIODS.forEach(p => {
+      const rec = data[p.key];
+      if (!rec) {
+        html += `
+          <div class="flex items-center justify-between bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3">
+            <span class="font-bold text-slate-400 text-[13px]">${p.label}</span>
+            <span class="text-slate-300 text-[12px] font-bold">無資料</span>
+          </div>`;
+        return;
+      }
+      const gmv = formatSalesNum(rec.gmv);
+      const qty = formatSalesNum(rec.qty);
+      html += `
+        <div class="bg-white border-2 border-slate-100 rounded-xl px-4 py-3 shadow-sm">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="font-extrabold text-slate-700 text-[13px]">${p.label}</span>
+            ${renderTrendBadge(rec.pctGmv)}
+          </div>
+          <div class="flex items-center gap-5 text-[13px]">
+            <div><span class="text-slate-400 font-bold">GMV</span> <span class="font-extrabold text-slate-800">${gmv !== null ? 'NT$' + gmv : '-'}</span></div>
+            <div><span class="text-slate-400 font-bold">件數</span> <span class="font-extrabold text-slate-800">${qty !== null ? qty : '-'}</span></div>
+          </div>
+        </div>`;
+    });
+
+    html += `</div>`;
+    area.innerHTML = html;
+  }
+
+  function loadAndShowSales(code) {
+    document.getElementById('salesSearchInput').value = code;
+    const area = document.getElementById('salesResultArea');
+    area.innerHTML = `<div class="text-center text-slate-400 text-[13px] font-bold py-10 flex flex-col items-center gap-3">
+      <svg class="w-6 h-6 animate-spin text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+      業績資料讀取中，首次載入資料量較大請稍候...
+    </div>`;
+    ensureSalesData().then(() => {
+      renderSalesResult(code);
+    }).catch(() => {
+      area.innerHTML = `<div class="bg-red-50 text-red-500 font-bold text-[13px] p-4 rounded-xl border-2 border-red-100">業績資料讀取失敗，請檢查網路後重試。</div>`;
+    });
+  }
+
+  function renderSalesPlaceholder() {
+    const area = document.getElementById('salesResultArea');
+    const candidates = [...new Set([
+      ...(modelCodes || []),
+      ...((previousSnapshot && previousSnapshot.items) || [])
+    ])];
+
+    let quick = '';
+    if (candidates.length > 0) {
+      quick = `
+        <div class="mt-2">
+          <p class="text-[11px] font-bold text-slate-400 mb-2">快速查詢（目前清單 / 現有紀錄）</p>
+          <div class="flex flex-wrap gap-2">
+            ${candidates.slice(0, 40).map(c => `<button onclick="loadAndShowSales('${c}')" class="px-3 py-1.5 bg-slate-50 border-2 border-slate-100 rounded-lg text-[12px] font-bold text-slate-600 active:bg-slate-100">${c}</button>`).join('')}
+          </div>
+        </div>`;
+    }
+    area.innerHTML = `<div class="text-center text-slate-400 text-[13px] font-bold py-6">輸入貨號查詢近期業績表現</div>${quick}`;
+  }
+
+  document.getElementById('btnSalesSearch').addEventListener('click', () => {
+    const code = document.getElementById('salesSearchInput').value.trim();
+    if (/^\d+$/.test(code)) loadAndShowSales(code);
+    else showToast('error', '請輸入有效的純數字貨號');
+  });
+  document.getElementById('salesSearchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btnSalesSearch').click(); }
+  });
+
+  // 分頁切換 (查詢 / 歷史清單)
+  const salesTabBtns = document.querySelectorAll('.sales-tab-btn');
+  const salesTabBg = document.getElementById('salesTabBg');
+  const salesQueryPanel = document.getElementById('salesQueryPanel');
+  const salesHistoryPanel = document.getElementById('salesHistoryPanel');
+  let salesActiveTab = 'query';
+
+  function switchSalesTab(tab) {
+    salesActiveTab = tab;
+    if (tab === 'query') {
+      salesTabBg.style.left = '4px';
+      salesTabBtns[0].classList.replace('text-slate-500', 'text-white');
+      salesTabBtns[1].classList.replace('text-white', 'text-slate-500');
+      salesQueryPanel.classList.remove('hidden');
+      salesHistoryPanel.classList.add('hidden');
+    } else {
+      salesTabBg.style.left = 'calc(50% + 2px)';
+      salesTabBtns[1].classList.replace('text-slate-500', 'text-white');
+      salesTabBtns[0].classList.replace('text-white', 'text-slate-500');
+      salesQueryPanel.classList.add('hidden');
+      salesHistoryPanel.classList.remove('hidden');
+      if (!historyCodesCache) loadHistoryCodes();
+    }
+  }
+  salesTabBtns.forEach(btn => btn.addEventListener('click', () => switchSalesTab(btn.dataset.tab)));
+
+  // 歷史清單：彙整「回覆紀錄」CSV 中，所有曾經被填入過 TG/Box 的貨號
+  let historyCodesCache = null;
+  let isHistoryLoading = false;
+
+  function loadHistoryCodes(forceRefresh = false) {
+    if (isHistoryLoading) return;
+    if (forceRefresh) historyCodesCache = null;
+    const listEl = document.getElementById('salesHistoryList');
+    const refreshBtn = document.getElementById('btnRefreshHistory');
+    const refreshIcon = refreshBtn.querySelector('svg');
+    isHistoryLoading = true;
+    refreshIcon.classList.add('animate-spin');
+    refreshBtn.disabled = true;
+    listEl.innerHTML = `<div class="text-center text-slate-400 text-[13px] font-bold py-10">讀取歷史紀錄中...</div>`;
+
+    fetchCsv(GOOGLE_RESPONSES_CSV_URL).then(txt => {
+      const rows = txt.split('\n').map(r => r.trim().split(','));
+      const map = new Map(); // code -> { lastTime, lastLoc }
+      for (let i = 1; i < rows.length; i++) {
+        if (!rows[i] || rows[i].length < 3) continue;
+        const time = (rows[i][0] || '').trim();
+        const loc = (rows[i][1] || '').trim();
+        const items = (rows[i][2] || '').split(/\s+/).filter(Boolean);
+        items.forEach(code => {
+          const prev = map.get(code);
+          if (!prev || time > prev.lastTime) {
+            map.set(code, { lastTime: time, lastLoc: loc });
+          }
+        });
+      }
+      const arr = Array.from(map.entries()).map(([code, info]) => ({ code, ...info }));
+      arr.sort((a, b) => (b.lastTime || '').localeCompare(a.lastTime || ''));
+      historyCodesCache = arr;
+      renderHistoryList(arr);
+    }).catch(() => {
+      listEl.innerHTML = `<div class="bg-red-50 text-red-500 font-bold text-[13px] p-4 rounded-xl border-2 border-red-100">歷史紀錄讀取失敗，請檢查網路後重試。</div>`;
+    }).finally(() => {
+      isHistoryLoading = false;
+      refreshIcon.classList.remove('animate-spin');
+      refreshBtn.disabled = false;
+    });
+  }
+
+  function renderHistoryList(arr) {
+    const listEl = document.getElementById('salesHistoryList');
+    if (!arr || arr.length === 0) {
+      listEl.innerHTML = `<div class="bg-slate-50 text-slate-500 font-bold text-[13px] p-4 rounded-xl border-2 border-slate-100">目前沒有任何歷史紀錄。</div>`;
+      return;
+    }
+    listEl.innerHTML = arr.map(item => `
+      <div onclick="loadAndShowSales('${item.code}'); switchSalesTab('query');" class="flex items-center bg-white rounded-xl border-2 border-slate-100 p-2 gap-3 shadow-sm mb-2 cursor-pointer active:opacity-70">
+        <div class="w-12 h-12 shrink-0 rounded-lg border border-slate-100 overflow-hidden bg-white">
+          <img src="https://product-picture.decathlon.cn/model/${item.code}.jpg?f=200" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-extrabold text-slate-700 text-[14px] tracking-wide">${item.code}</div>
+          <div class="text-slate-400 text-[11px] font-bold truncate">${item.lastLoc || '-'} · ${formatDateYMD(item.lastTime) || '-'}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('btnRefreshHistory').addEventListener('click', () => loadHistoryCodes(true));
+
+  // 開啟 / 關閉業績查詢 Bottom Sheet
+  const salesSheet = document.getElementById('salesSheet');
+  const salesBg = document.getElementById('salesBg');
+  const salesContent = document.getElementById('salesContent');
+
+  window.openSalesSheet = function(code) {
+    updateSalesPeriodLabels(); // 每次開啟都重新計算週數，避免跨週後標籤過期
+    salesSheet.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        salesBg.classList.remove('opacity-0');
+        salesContent.classList.remove('translate-y-full');
+      });
+    });
+    switchSalesTab('query');
+    if (code) loadAndShowSales(code);
+    else renderSalesPlaceholder();
+  };
+
+  window.loadAndShowSales = loadAndShowSales;
+  window.switchSalesTab = switchSalesTab;
+
+  function closeSalesSheet() {
+    salesBg.classList.add('opacity-0');
+    salesContent.classList.add('translate-y-full');
+    setTimeout(() => salesSheet.classList.add('hidden'), 300);
+  }
+  document.getElementById('btnOpenSales').addEventListener('click', () => openSalesSheet());
+  document.getElementById('btnCloseSales').addEventListener('click', closeSalesSheet);
+  salesBg.addEventListener('click', closeSalesSheet);
 
   // ------------------------------------
   // Step 2: 商品邏輯 (加入與驗證)
@@ -964,6 +1391,46 @@
     }
   }
 
+  function renderExistingQuickAdd() {
+    const section = document.getElementById('existingQuickAddSection');
+    const grid = document.getElementById('existingQuickAddGrid');
+    const badge = document.getElementById('existingQuickAddCount');
+    const allItems = (previousSnapshot && previousSnapshot.items) || [];
+
+    if (allItems.length === 0) {
+      section.classList.add('hidden');
+      return;
+    }
+    section.classList.remove('hidden');
+
+    // 已加入的商品直接從這份清單移除，避免跟上方「已加入清單」重複顯示
+    const remaining = allItems.filter(code => !modelCodes.includes(code));
+    badge.innerText = `${remaining.length} 件`;
+
+    if (remaining.length === 0) {
+      grid.innerHTML = `<div class="col-span-2 flex items-center gap-2 bg-green-50 text-green-600 font-bold text-[13px] p-4 rounded-xl border-2 border-green-100"><svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>現有商品都已加入清單</div>`;
+      return;
+    }
+
+    grid.innerHTML = remaining.map(code => `
+      <div onclick="toggleQuickAddCode('${code}')" class="flex items-center bg-white rounded-xl border-2 border-slate-100 p-1.5 gap-2 shadow-sm cursor-pointer active:opacity-70 transition-colors">
+        <div class="w-12 h-12 shrink-0 rounded-lg border border-slate-100 overflow-hidden bg-white">
+          <img src="https://product-picture.decathlon.cn/model/${code}.jpg?f=200" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
+        </div>
+        <div class="flex-1 min-w-0 font-bold text-slate-700 text-[14px] tracking-tighter truncate">${code}</div>
+      </div>`
+    ).join('');
+  }
+
+  window.toggleQuickAddCode = function(code) {
+    if (modelCodes.includes(code)) {
+      modelCodes = modelCodes.filter(c => c !== code);
+    } else {
+      modelCodes = [...modelCodes, code];
+    }
+    updateItemsGrid();
+  };
+
   function updateItemsGrid() {
     const grid = document.getElementById('itemsGrid');
     document.getElementById('itemCountBadge').innerText = `${modelCodes.length} 件`;
@@ -977,16 +1444,19 @@
     } else {
       grid.innerHTML = modelCodes.map(code => `
         <div class="flex items-center bg-white rounded-xl border-2 border-slate-100 p-2 gap-3 shadow-sm relative animate-[fadeIn_0.2s_ease-out]">
-          <div class="w-16 h-16 shrink-0 rounded-lg border-2 border-slate-50 overflow-hidden bg-white">
-            <img src="https://product-picture.decathlon.cn/model/${code}.jpg?f=400" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
+          <div onclick="openSalesSheet('${code}')" class="flex items-center flex-1 min-w-0 gap-3 cursor-pointer active:opacity-70">
+            <div class="w-16 h-16 shrink-0 rounded-lg border-2 border-slate-50 overflow-hidden bg-white">
+              <img src="https://product-picture.decathlon.cn/model/${code}.jpg?f=400" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
+            </div>
+            <div class="flex-1 min-w-0 font-extrabold text-slate-700 text-[16px] tracking-wider truncate">${code}</div>
           </div>
-          <div class="flex-1 font-extrabold text-slate-700 text-[16px] tracking-wider">${code}</div>
-          <button onclick="removeItem('${code}')" class="w-10 h-10 shrink-0 bg-red-50 rounded-full flex items-center justify-center text-red-500 active:bg-red-100 mr-1">
+          <button onclick="event.stopPropagation(); removeItem('${code}')" class="w-10 h-10 shrink-0 bg-red-50 rounded-full flex items-center justify-center text-red-500 active:bg-red-100 mr-1">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
           </button>
         </div>
       `).join('');
     }
+    renderExistingQuickAdd();
     updateMainBtnState();
   }
 
@@ -1118,7 +1588,7 @@
       else if (type === 'retain') color = 'text-slate-600 bg-slate-50 border-slate-200'; 
 
       return `
-        <div class="flex items-center gap-2 p-1.5 pr-3 rounded-lg border-2 ${color} bg-white shadow-sm">
+        <div onclick="openSalesSheet('${code}')" class="flex items-center gap-2 p-1.5 pr-3 rounded-lg border-2 ${color} bg-white shadow-sm cursor-pointer active:opacity-70">
           <div class="w-7 h-7 rounded bg-white overflow-hidden shrink-0 border border-slate-100">
             <img src="https://product-picture.decathlon.cn/model/${code}.jpg?f=200" class="w-full h-full object-cover" onerror="this.src='${fallbackSvg}'">
           </div>
